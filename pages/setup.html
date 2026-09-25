@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>تعریف رمز عبور پـنـل</title>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+	<script>
+		window.GLOBAL_GFX = "/*{{GFX_SETTING}}*/";
+		if (window.GLOBAL_GFX === 'false' || (window.GLOBAL_GFX.startsWith('/*') && localStorage.getItem('gfx-enabled') !== 'true')) {
+			document.documentElement.classList.add('gfx-off');
+		}
+		if (localStorage.getItem('color-theme') === 'light' && window.location.pathname === '/panel') {
+			document.documentElement.classList.remove('dark');
+		} else {
+			document.documentElement.classList.add('dark');
+		}
+		if (localStorage.getItem('grayscale-theme') === 'true') {
+			document.documentElement.classList.add('grayscale-active');
+		}
+		try { localStorage.removeItem('proxy_flag_cache'); } catch(e) {}
+	</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+	<link rel="manifest" href="/manifest.json">
+	<link rel="icon" type="image/svg+xml" href="/icon.svg">
+	<link rel="apple-touch-icon" href="/icon-192.png">
+	<meta name="theme-color" content="#060913">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="TAJPANEL">
+	<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+<script>
+	if (typeof tailwind !== 'undefined') { tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+				colors: { amoled: { bg: '#060913', card: '#0d1526', input: '#0a1220', border: 'rgba(148, 163, 255, 0.13)' } }
+			}
+		}
+	}
+}
+</script>
+<style>
+	.cursor-wrapper {
+		pointer-events: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999;
+		display: none;
+	}
+	.hidden {
+		display: none !important;
+	}
+	
+	/* TAJPANEL High-Contrast Styles for Modals */
+	#user-modal input[type="text"],
+	#user-modal input[type="number"],
+	#user-modal input[type="password"],
+	#user-modal textarea,
+	#user-modal select,
+	#bulk-modal input,
+	#warp-modal textarea,
+	#telegram-modal input {
+		color: #0f172a !important;
+		background-color: #ffffff !important;
+		border: 1.5px solid #94a3b8 !important;
+		font-weight: 700 !important;
+	}
+	.dark #user-modal input[type="text"],
+	.dark #user-modal input[type="number"],
+	.dark #user-modal input[type="password"],
+	.dark #user-modal textarea,
+	.dark #user-modal select,
+	.dark #bulk-modal input,
+	.dark #warp-modal textarea,
+	.dark #telegram-modal input {
+		color: #ffffff !important;
+		background-color: rgba(4, 10, 24, 0.55) !important;
+		border: 1.5px solid rgba(129, 116, 255, 0.5) !important;
+		font-weight: 700 !important;
+	}
+	#user-modal input::placeholder,
+	#user-modal textarea::placeholder {
+		color: #64748b !important;
+		opacity: 1 !important;
+	}
+	.dark #user-modal input::placeholder,
+	.dark #user-modal textarea::placeholder {
+		color: #94a3b8 !important;
+		opacity: 1 !important;
+	}
+
+	/* Standard cursor for Windows and all platforms */
+	*, *::before, *::after {
+		cursor: auto !important;
+	}
+	a, button, input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], select, [role="button"], .cursor-pointer, .btn, label {
+		cursor: pointer !important;
+	}
+	input[type="text"], input[type="password"], input[type="number"], textarea {
+		cursor: text !important;
+	}
+	.cursor-wrapper, #cursor-dot, #cursor-ring-pos, #cursor-glow-pos {
+		display: none !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+	#cursor-dot {
+		width: 6px;
+		height: 6px;
+		background-color: #2563eb;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #2563eb, 0 0 16px #1d4ed8;
+		transform: translate(-50%, -50%);
+	}
+	#cursor-ring-pos {
+		width: 36px;
+		height: 36px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	#cursor-ring-visual {
+		width: 100%;
+		height: 100%;
+		border: 1.5px dashed rgba(37, 99, 235, 0.9);
+		border-radius: 50%;
+		animation: spinRing 10s linear infinite;
+		transition: border-color 0.2s, background-color 0.2s;
+	}
+	@keyframes spinRing {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	body.hover-active #cursor-ring-pos {
+		width: 48px;
+		height: 48px;
+	}
+	body.hover-active #cursor-ring-visual {
+		border: 2px solid #2563eb;
+		background-color: rgba(37, 99, 235, 0.2);
+		animation: spinRingFast 3s linear infinite;
+	}
+	@keyframes spinRingFast {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	#cursor-glow-pos {
+		width: 40px;
+		height: 40px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	body.hover-active #cursor-glow-pos {
+		width: 54px;
+		height: 54px;
+	}
+	#cursor-glow-visual {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.1) 40%, transparent 70%);
+	}
+		:root {
+			--bg-tint: rgba(59, 130, 246, 0.03);
+			--plane-color: #93c5fd; 
+			--plane-dark: #f9fafb;
+			--plane-opacity: 0.20;
+		}
+		.dark {
+			--bg-tint: rgba(16, 32, 64, 0.4); 
+			--plane-color: #1d4ed8; 
+			--plane-dark: #000105;
+			--plane-opacity: 0.15;
+		}
+		.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+		#waves { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+		.vignette {
+			position: fixed; inset: 0; z-index: 2; pointer-events: none;
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(255,255,255,0.5) 100%);
+		}
+		.dark .vignette {
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(0,1,5,0.85) 100%);
+		}
+		.ambient {
+			position: fixed; inset: 0; z-index: 1; pointer-events: none;
+			background:
+				radial-gradient(700px 500px at 12% 20%, var(--bg-tint), transparent 60%),
+				radial-gradient(800px 600px at 90% 90%, var(--bg-tint), transparent 60%);
+		}
+</style>
+	<style>
+	/* ---- Aurora Glass theme ---- */
+	html.dark { background: #060913; --bg-tint: rgba(99, 102, 241, 0.06); --plane-color: #6366f1; --plane-dark: #060913; --plane-opacity: 0.35; }
+	html.dark body { background: #060913; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+	html.dark:not(.gfx-off) body::before {
+		content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+		background:
+			radial-gradient(900px 620px at 8% -2%, rgba(99,102,241,0.17), transparent 60%),
+			radial-gradient(820px 540px at 96% 6%, rgba(34,211,238,0.10), transparent 55%),
+			radial-gradient(780px 560px at 90% 94%, rgba(217,70,239,0.08), transparent 60%),
+			radial-gradient(660px 500px at 10% 96%, rgba(59,130,246,0.10), transparent 55%);
+	}
+	html.dark [class*="bg-amoled-card"] {
+		background-color: rgba(13, 21, 38, 0.60) !important;
+		backdrop-filter: blur(16px) saturate(1.25);
+		-webkit-backdrop-filter: blur(16px) saturate(1.25);
+	}
+	html.dark [class*="bg-amoled-input"] { background-color: rgba(3, 8, 20, 0.50) !important; }
+	html.dark [class*="bg-amoled-bg"] { background-color: rgba(6, 9, 19, 0.60) !important; }
+	html.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+	html.dark ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+	html.dark ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #22d3ee); border-radius: 999px; }
+	html.dark ::selection { background: rgba(99, 102, 241, 0.45); color: #fff; }
+	html.dark [class~="bg-blue-600"] { background-color: #5754ee; }
+	html.dark [class~="hover:bg-blue-600"]:hover { background-color: #4643d8; }
+	html.dark [class~="bg-blue-500"] { background-color: #6157f5; }
+	html.dark [class~="text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="text-blue-500"] { color: #8e97fb; }
+	html.dark [class~="text-blue-600"] { color: #837cf9; }
+	html.dark [class~="dark:text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="border-blue-500"], html.dark [class~="dark:border-blue-500"] { border-color: rgba(124, 116, 255, 0.5); }
+	html.dark [class~="border-blue-600"] { border-color: rgba(124, 116, 255, 0.55); }
+	html.dark [class~="bg-blue-100"] { background-color: rgba(99, 102, 241, 0.15); }
+	html.dark [class~="dark:bg-blue-900\/30"] { background-color: rgba(87, 84, 238, 0.16); }
+	html.dark [class~="dark:hover:bg-blue-900\/40"]:hover { background-color: rgba(87, 84, 238, 0.24); }
+	html.dark [class~="focus:ring-blue-500"]:focus, html.dark [class~="focus:ring-blue-500\/50"]:focus { --tw-ring-color: rgba(124, 116, 255, 0.4) !important; }
+	html.dark [class~="focus:border-blue-500"]:focus { border-color: rgba(124, 116, 255, 0.6) !important; }
+	</style>
+<!-- Native System Cursor Active Everywhere -->
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-amoled-bg dark:text-zinc-100 min-h-screen flex flex-col items-center justify-center p-4 gap-6">
+
+	<div class="w-full max-w-md bg-white dark:bg-amoled-card border border-gray-200 dark:border-amoled-border rounded-md shadow-xl p-6 relative z-10">
+		<h2 class="text-xl font-bold mb-2 text-center text-blue-600 dark:text-blue-400">تنظیم رمز عبور جدید</h2>
+		<p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">این اولین ورود شما به پـنـل مدیریت است. لطفاً رمز عبور خود را تعیین کنید.</p>
+		<form onsubmit="handleSetup(event)" class="space-y-4">
+			<div>
+				<label class="block text-sm font-medium mb-1.5">رمز عبور</label>
+				<input type="password" id="password" class="w-full px-3 py-2 bg-gray-50 dark:bg-amoled-input border border-gray-300 dark:border-amoled-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-center font-mono" required minlength="4">
+			</div>
+			<div>
+				<label class="block text-sm font-medium mb-1.5">تکرار رمز عبور</label>
+				<input type="password" id="confirm-password" class="w-full px-3 py-2 bg-gray-50 dark:bg-amoled-input border border-gray-300 dark:border-amoled-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-center font-mono" required minlength="4">
+			</div>
+			<button type="submit" id="submit-btn" class="w-full py-2.5 bg-transparent border-2 border-green-600 text-green-700 hover:bg-green-900/20 hover:text-green-800 dark:border-green-500 dark:text-green-500 dark:hover:bg-green-900/40 dark:hover:text-green-400 font-medium rounded-md text-sm transition font-bold">ثبت و ورود</button>
+		</form>
+	</div>
+	<div class="flex flex-col gap-4 relative z-10 w-full max-w-md">
+		<div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-center">
+			
+			
+		</div>
+		<div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-center">
+			
+			
+		</div>
+	</div>
+	
+	<script>
+		;
+		async function handleSetup(event) {
+			event.preventDefault();
+			const password = document.getElementById('password').value.trim();
+			const confirmPassword = document.getElementById('confirm-password').value.trim();
+			const btn = document.getElementById('submit-btn');
+			if (password !== confirmPassword) {
+				alert('⚠️ رمز عبور و تکرار آن مطابقت ندارند!');
+				return;
+			}
+			btn.disabled = true;
+			btn.innerText = 'در حال ثبت...';
+			try {
+				const res = await fetch('/api/setup-password', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ password })
+				});
+				const data = await res.json();
+				if (res.ok && data.success) {
+					alert('✅ رمز عبور با موفقیت تنظیم شد. در حال ورود...');
+					setTimeout(() => {
+						window.location.reload();
+					}, 1500);
+				} else {
+					alert('خطا: ' + (data.error || 'عملیات ناموفق بود'));
+				}
+			} catch (err) {
+				alert('خطا در ارتباط با سرور');
+			} finally {
+				btn.disabled = false;
+				btn.innerText = 'ثبت و ورود';
+			}
+		}
+	</script>
+	
+</body>
+</html>

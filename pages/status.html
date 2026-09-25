@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>وضعیت اشتراک کاربر</title>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+	<script>
+		window.GLOBAL_GFX = "/*{{GFX_SETTING}}*/";
+		if (window.GLOBAL_GFX === 'false' || (window.GLOBAL_GFX.startsWith('/*') && localStorage.getItem('gfx-enabled') !== 'true')) {
+			document.documentElement.classList.add('gfx-off');
+		}
+		if (localStorage.getItem('color-theme') === 'light' && window.location.pathname === '/panel') {
+			document.documentElement.classList.remove('dark');
+		} else {
+			document.documentElement.classList.add('dark');
+		}
+		if (localStorage.getItem('grayscale-theme') === 'true') {
+			document.documentElement.classList.add('grayscale-active');
+		}
+		try { localStorage.removeItem('proxy_flag_cache'); } catch(e) {}
+	</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+	<link rel="manifest" href="/manifest.json">
+	<link rel="icon" type="image/svg+xml" href="/icon.svg">
+	<link rel="apple-touch-icon" href="/icon-192.png">
+	<meta name="theme-color" content="#060913">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="TAJPANEL">
+	<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+<script>
+	if (typeof tailwind !== 'undefined') { tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+				colors: { amoled: { bg: '#060913', card: '#0d1526', input: '#0a1220', border: 'rgba(148, 163, 255, 0.13)' } }
+			}
+		}
+	}
+}
+</script>
+<style>
+	.cursor-wrapper {
+		pointer-events: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999;
+		display: none;
+	}
+	.hidden {
+		display: none !important;
+	}
+	
+	/* TAJPANEL High-Contrast Styles for Modals */
+	#user-modal input[type="text"],
+	#user-modal input[type="number"],
+	#user-modal input[type="password"],
+	#user-modal textarea,
+	#user-modal select,
+	#bulk-modal input,
+	#warp-modal textarea,
+	#telegram-modal input {
+		color: #0f172a !important;
+		background-color: #ffffff !important;
+		border: 1.5px solid #94a3b8 !important;
+		font-weight: 700 !important;
+	}
+	.dark #user-modal input[type="text"],
+	.dark #user-modal input[type="number"],
+	.dark #user-modal input[type="password"],
+	.dark #user-modal textarea,
+	.dark #user-modal select,
+	.dark #bulk-modal input,
+	.dark #warp-modal textarea,
+	.dark #telegram-modal input {
+		color: #ffffff !important;
+		background-color: rgba(4, 10, 24, 0.55) !important;
+		border: 1.5px solid rgba(129, 116, 255, 0.5) !important;
+		font-weight: 700 !important;
+	}
+	#user-modal input::placeholder,
+	#user-modal textarea::placeholder {
+		color: #64748b !important;
+		opacity: 1 !important;
+	}
+	.dark #user-modal input::placeholder,
+	.dark #user-modal textarea::placeholder {
+		color: #94a3b8 !important;
+		opacity: 1 !important;
+	}
+
+	/* Standard cursor for Windows and all platforms */
+	*, *::before, *::after {
+		cursor: auto !important;
+	}
+	a, button, input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], select, [role="button"], .cursor-pointer, .btn, label {
+		cursor: pointer !important;
+	}
+	input[type="text"], input[type="password"], input[type="number"], textarea {
+		cursor: text !important;
+	}
+	.cursor-wrapper, #cursor-dot, #cursor-ring-pos, #cursor-glow-pos {
+		display: none !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+	#cursor-dot {
+		width: 6px;
+		height: 6px;
+		background-color: #2563eb;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #2563eb, 0 0 16px #1d4ed8;
+		transform: translate(-50%, -50%);
+	}
+	#cursor-ring-pos {
+		width: 36px;
+		height: 36px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	#cursor-ring-visual {
+		width: 100%;
+		height: 100%;
+		border: 1.5px dashed rgba(37, 99, 235, 0.9);
+		border-radius: 50%;
+		animation: spinRing 10s linear infinite;
+		transition: border-color 0.2s, background-color 0.2s;
+	}
+	@keyframes spinRing {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	body.hover-active #cursor-ring-pos {
+		width: 48px;
+		height: 48px;
+	}
+	body.hover-active #cursor-ring-visual {
+		border: 2px solid #2563eb;
+		background-color: rgba(37, 99, 235, 0.2);
+		animation: spinRingFast 3s linear infinite;
+	}
+	@keyframes spinRingFast {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	#cursor-glow-pos {
+		width: 40px;
+		height: 40px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	body.hover-active #cursor-glow-pos {
+		width: 54px;
+		height: 54px;
+	}
+	#cursor-glow-visual {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.1) 40%, transparent 70%);
+	}
+		:root {
+			--bg-tint: rgba(59, 130, 246, 0.03);
+			--plane-color: #93c5fd; 
+			--plane-dark: #f9fafb;
+			--plane-opacity: 0.20;
+		}
+		.dark {
+			--bg-tint: rgba(16, 32, 64, 0.4); 
+			--plane-color: #1d4ed8; 
+			--plane-dark: #000105;
+			--plane-opacity: 0.15;
+		}
+		.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+		#waves { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+		.vignette {
+			position: fixed; inset: 0; z-index: 2; pointer-events: none;
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(255,255,255,0.5) 100%);
+		}
+		.dark .vignette {
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(0,1,5,0.85) 100%);
+		}
+		.ambient {
+			position: fixed; inset: 0; z-index: 1; pointer-events: none;
+			background:
+				radial-gradient(700px 500px at 12% 20%, var(--bg-tint), transparent 60%),
+				radial-gradient(800px 600px at 90% 90%, var(--bg-tint), transparent 60%);
+		}
+</style>
+	<style>
+	/* ---- Aurora Glass theme ---- */
+	html.dark { background: #060913; --bg-tint: rgba(99, 102, 241, 0.06); --plane-color: #6366f1; --plane-dark: #060913; --plane-opacity: 0.35; }
+	html.dark body { background: #060913; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+	html.dark:not(.gfx-off) body::before {
+		content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+		background:
+			radial-gradient(900px 620px at 8% -2%, rgba(99,102,241,0.17), transparent 60%),
+			radial-gradient(820px 540px at 96% 6%, rgba(34,211,238,0.10), transparent 55%),
+			radial-gradient(780px 560px at 90% 94%, rgba(217,70,239,0.08), transparent 60%),
+			radial-gradient(660px 500px at 10% 96%, rgba(59,130,246,0.10), transparent 55%);
+	}
+	html.dark [class*="bg-amoled-card"] {
+		background-color: rgba(13, 21, 38, 0.60) !important;
+		backdrop-filter: blur(16px) saturate(1.25);
+		-webkit-backdrop-filter: blur(16px) saturate(1.25);
+	}
+	html.dark [class*="bg-amoled-input"] { background-color: rgba(3, 8, 20, 0.50) !important; }
+	html.dark [class*="bg-amoled-bg"] { background-color: rgba(6, 9, 19, 0.60) !important; }
+	html.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+	html.dark ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+	html.dark ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #22d3ee); border-radius: 999px; }
+	html.dark ::selection { background: rgba(99, 102, 241, 0.45); color: #fff; }
+	html.dark [class~="bg-blue-600"] { background-color: #5754ee; }
+	html.dark [class~="hover:bg-blue-600"]:hover { background-color: #4643d8; }
+	html.dark [class~="bg-blue-500"] { background-color: #6157f5; }
+	html.dark [class~="text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="text-blue-500"] { color: #8e97fb; }
+	html.dark [class~="text-blue-600"] { color: #837cf9; }
+	html.dark [class~="dark:text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="border-blue-500"], html.dark [class~="dark:border-blue-500"] { border-color: rgba(124, 116, 255, 0.5); }
+	html.dark [class~="border-blue-600"] { border-color: rgba(124, 116, 255, 0.55); }
+	html.dark [class~="bg-blue-100"] { background-color: rgba(99, 102, 241, 0.15); }
+	html.dark [class~="dark:bg-blue-900\/30"] { background-color: rgba(87, 84, 238, 0.16); }
+	html.dark [class~="dark:hover:bg-blue-900\/40"]:hover { background-color: rgba(87, 84, 238, 0.24); }
+	html.dark [class~="focus:ring-blue-500"]:focus, html.dark [class~="focus:ring-blue-500\/50"]:focus { --tw-ring-color: rgba(124, 116, 255, 0.4) !important; }
+	html.dark [class~="focus:border-blue-500"]:focus { border-color: rgba(124, 116, 255, 0.6) !important; }
+	</style>
+<!-- Native System Cursor Active Everywhere -->
+	<style>
+		body { font-family: 'Vazirmatn', sans-serif; }
+		.glass {
+			background: rgba(10, 10, 10, 0.6);
+			border: 1px solid rgba(255, 255, 255, 0.05);
+		}
+		.lml-flag {
+			display: inline-block;
+			width: 1.35em;
+			height: 1em;
+			vertical-align: -0.15em;
+			border-radius: 2px;
+			background-size: cover;
+			background-position: 50%;
+			background-repeat: no-repeat;
+		}
+		.lml-flag-globe {
+			font-size: 1.1em;
+			line-height: 1;
+			vertical-align: -0.05em;
+		}
+	</style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-amoled-bg dark:text-zinc-100 min-h-screen flex flex-col items-center py-12 px-4 overflow-x-hidden">
+
+	<div class="w-full max-w-xl glass rounded-md shadow-2xl p-6 md:p-8 relative overflow-hidden z-10">
+		<div class="absolute -left-12 -top-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="absolute -right-12 -bottom-12 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+		<div class="text-center mb-8 relative z-10">
+			<div class="inline-flex items-center justify-center p-3 bg-blue-950/60 border border-blue-500 text-blue-400 rounded-md mb-4 shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+				<svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+			</div>
+			<h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white mb-1">TAJPANEL - وضعیت اشتراک</h1>
+			<p id="display-username" class="text-sm font-bold text-blue-500 tracking-wide font-mono mb-2"></p>
+			<p id="display-flag" class="text-2xl font-bold tracking-wide mb-3" style="display:none;"></p>
+			<div id="live-connections-badge" style="display: none !important;">
+				<span class="w-2 h-2 rounded-full bg-green-600 animate-pulse"></span>
+				<span id="live-connections-text" dir="rtl">۰ دستگاه متصل</span>
+			</div>
+		</div>
+		<div id="status-card" class="mb-6 rounded-md p-4 text-center border font-bold relative z-10 transition duration-300">
+			<span id="status-text" class="text-sm">در حال بارگذاری وضعیت...</span>
+		</div>
+		<div class="grid grid-cols-2 gap-3 mb-8 relative z-10">
+			<div class="bg-white/40 dark:bg-zinc-900/30 border border-gray-200 dark:border-amoled-border rounded-md p-3 shadow-sm flex flex-col justify-between">
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-[10px] font-semibold text-gray-600 dark:text-zinc-400 flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+						حجم مصرفی
+					</span>
+					<span id="volume-pct" class="text-[10px] font-bold text-gray-800 dark:text-zinc-200">۰٪</span>
+				</div>
+				<div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2">
+					<div id="volume-progress" class="h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+				</div>
+				<div class="flex justify-between text-[9px] text-gray-500 dark:text-zinc-400 font-medium">
+					<span id="used-vol" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">-</span>
+					<span id="limit-vol" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">-</span>
+				</div>
+			</div>
+			<div class="bg-white/40 dark:bg-zinc-900/30 border border-gray-200 dark:border-amoled-border rounded-md p-3 shadow-sm flex flex-col justify-between">
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-[10px] font-semibold text-gray-600 dark:text-zinc-400 flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+						زمان باقی‌مانده
+					</span>
+					<span id="expiry-pct" class="text-[10px] font-bold text-gray-800 dark:text-zinc-200">۰٪</span>
+				</div>
+				<div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2 flex justify-end">
+					<div id="expiry-progress" class="h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+				</div>
+				<div class="flex justify-between text-[9px] text-gray-500 dark:text-zinc-400 font-medium">
+					<span id="days-remaining" class="font-bold text-gray-800 dark:text-zinc-200" dir="rtl">-</span>
+					<span id="total-days" class="font-bold text-gray-800 dark:text-zinc-200" dir="rtl">-</span>
+				</div>
+			</div>
+			<div class="bg-white/40 dark:bg-zinc-900/30 border border-gray-200 dark:border-amoled-border rounded-md p-3 shadow-sm flex flex-col justify-between">
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-[10px] font-semibold text-gray-600 dark:text-zinc-400 flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+						ریکوئست‌ها
+					</span>
+					<span id="req-pct" class="text-[10px] font-bold text-gray-800 dark:text-zinc-200">۰٪</span>
+				</div>
+				<div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2">
+					<div id="req-progress" class="h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+				</div>
+				<div class="flex justify-between text-[9px] text-gray-500 dark:text-zinc-400 font-medium">
+					<span id="used-req" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">-</span>
+					<span id="limit-req" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">-</span>
+				</div>
+			</div>
+			<div class="bg-white/40 dark:bg-zinc-900/30 border border-gray-200 dark:border-amoled-border rounded-md p-3 shadow-sm flex flex-col justify-between">
+				<div class="flex justify-between items-center mb-2">
+					<span class="text-[10px] font-semibold text-gray-600 dark:text-zinc-400 flex items-center gap-1">
+						<svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+						دستگاه متصل
+					</span>
+					<span id="online-pct" class="text-[10px] font-bold text-gray-800 dark:text-zinc-200">۰٪</span>
+				</div>
+				<div class="w-full bg-gray-200 dark:bg-zinc-800 rounded-full h-1.5 overflow-hidden mb-2">
+					<div id="online-progress" class="h-1.5 rounded-full transition-all duration-1000" style="width: 0%"></div>
+				</div>
+				<div class="flex justify-between text-[9px] text-gray-500 dark:text-zinc-400 font-medium">
+					<span id="online-count" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">۰</span>
+					<span id="limit-online" class="font-bold text-gray-800 dark:text-zinc-200" dir="ltr">-</span>
+				</div>
+			</div>
+		</div>
+		<div class="border-t border-gray-100 dark:border-zinc-800 pt-6 relative z-10">
+			<h2 class="text-sm font-bold mb-4 flex items-center gap-2">
+				<svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+				دریافت کـانفـیگ و اشتراک‌ها
+			</h2>
+			<div class="space-y-3">
+				<!-- 1-Click Universal App Import -->
+		<div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-blue-900/20 via-indigo-900/20 to-purple-900/20 border border-blue-500/30 shadow-lg relative z-10">
+			<div class="flex items-center justify-between mb-3">
+				<span class="text-xs font-black text-blue-400 flex items-center gap-1.5">
+					<span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+					⚡ اتصال ۱-کلیک به برنامه‌ها:
+				</span>
+				<button type="button" onclick="testLiveStatusPing()" id="status-ping-btn" class="text-[10px] px-2.5 py-1 rounded-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 font-bold transition">
+					⚡ تست پینگ سرور
+				</button>
+			</div>
+			<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+				<a id="btn-v2rayng" href="#" class="p-2.5 rounded-lg bg-blue-600/15 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 font-bold text-xs text-center transition flex flex-col items-center gap-1 shadow-sm">
+					<span>📱 v2rayNG</span>
+					<span class="text-[9px] text-slate-400 font-normal">نصب خودکار</span>
+				</a>
+				<a id="btn-hiddify" href="#" class="p-2.5 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-400 font-bold text-xs text-center transition flex flex-col items-center gap-1 shadow-sm">
+					<span>🛡️ Hiddify</span>
+					<span class="text-[9px] text-slate-400 font-normal">نصب خودکار</span>
+				</a>
+				<a id="btn-streisand" href="#" class="p-2.5 rounded-lg bg-purple-600/15 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 font-bold text-xs text-center transition flex flex-col items-center gap-1 shadow-sm">
+					<span>🚀 Streisand</span>
+					<span class="text-[9px] text-slate-400 font-normal">نصب خودکار</span>
+				</a>
+				<a id="btn-singbox" href="#" class="p-2.5 rounded-lg bg-emerald-600/15 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 font-bold text-xs text-center transition flex flex-col items-center gap-1 shadow-sm">
+					<span>⚡ Sing-box</span>
+					<span class="text-[9px] text-slate-400 font-normal">نصب خودکار</span>
+				</a>
+			</div>
+		</div>
+
+		<button onclick="copyTextSub()" class="w-full flex justify-between items-center px-4 py-3 bg-white dark:bg-amoled-card border border-gray-200 dark:border-amoled-border hover:border-indigo-500 dark:hover:border-indigo-500 rounded-md text-xs font-medium transition shadow-sm">
+					<span class="flex items-center gap-2"><svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg> کپی لینک ساب‌اسکریپشن متنی</span>
+					<span class="text-indigo-500">کپی</span>
+				</button>
+				<button onclick="showSubQr()" class="w-full flex justify-between items-center px-4 py-3 bg-white dark:bg-amoled-card border border-gray-200 dark:border-amoled-border hover:border-amber-500 dark:hover:border-amber-500 rounded-md text-xs font-medium transition shadow-sm">
+					<span class="flex items-center gap-2"><svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 19h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg> دریافت کیوآر کد ساب</span>
+					<span class="text-amber-500">نمایش</span>
+				</button>
+				<button onclick="copyvIeesConfig()" class="w-full flex justify-between items-center px-4 py-3 bg-white dark:bg-amoled-card border border-gray-200 dark:border-amoled-border hover:border-blue-500 dark:hover:border-blue-500 rounded-md text-xs font-medium transition shadow-sm">
+					<span class="flex items-center gap-2"><svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> کپی کـانفـیگ‌های اتصال (مستقیم)</span>
+					<span class="text-blue-500">کپی</span>
+				</button>
+			</div>
+		</div>
+		<div class="border-t border-gray-100 dark:border-zinc-800 pt-6 mt-6 relative z-10 w-full">
+			<button onclick="document.getElementById('software-downloads-content').classList.toggle('hidden'); document.getElementById('software-downloads-icon').classList.toggle('rotate-180');" class="w-full flex items-center justify-between text-sm font-bold mb-4 cursor-pointer focus:outline-none">
+				<div class="flex items-center gap-2">
+					<svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+					<span>دانلود نرم افزار ها</span>
+				</div>
+				<svg id="software-downloads-icon" class="w-4 h-4 text-gray-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+			</button>
+			<div id="software-downloads-content" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-3">
+				<div class="bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-800/30 rounded-md p-2.5">
+					<div class="flex items-center gap-1.5 mb-2.5 text-green-700 dark:text-green-500 font-bold text-[11px]">
+						<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0004.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02L19.695 6.183c.1568-.2716.0637-.6182-.2079-.7754-.2716-.1564-.6183-.0633-.775.2082l-1.8584 3.2185c-1.3853-.6328-2.9697-.9881-4.6644-.9881-1.6946 0-3.279.3553-4.664.9881L5.6664 5.6158c-.1567-.2715-.5038-.3646-.775-.2082-.2716.1572-.3647.5038-.2079.7754l1.8136 3.1385C2.963 11.2384 1.1571 14.5422 1 18.4234h22c-.1572-3.8812-1.963-7.185-5.4955-9.102"/></svg>
+						اندروید
+					</div>
+					<div class="flex flex-col gap-1.5">
+						
+						
+						
+						
+						<a href="https://play.google.com/store/apps/details?id=com.napsternetlabs.napsternetv" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-green-400 dark:hover:border-green-500 transition shadow-sm"><span>Npv Tunnel</span><span class="text-green-500 text-[12px]">📥</span></a>
+						<a href="https://play.google.com/store/apps/details?id=dev.hexasoftware.v2box" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-green-400 dark:hover:border-green-500 transition shadow-sm"><span>V2Box</span><span class="text-green-500 text-[12px]">📥</span></a>
+						
+						
+					</div>
+				</div>
+				<div class="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30 rounded-md p-2.5">
+					<div class="flex items-center gap-1.5 mb-2.5 text-blue-700 dark:text-blue-500 font-bold text-[11px]">
+						<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.801"/></svg>
+						ویندوز
+					</div>
+					<div class="flex flex-col gap-1.5">
+						
+						
+						
+						
+						
+					</div>
+				</div>
+				<div class="bg-gray-50/50 dark:bg-zinc-800/30 border border-gray-200/50 dark:border-gray-700/50 rounded-md p-2.5">
+					<div class="flex items-center gap-1.5 mb-2.5 text-gray-700 dark:text-gray-300 font-bold text-[11px]">
+						<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.05 2.95.72 3.88 1.84-3.46 2.06-2.89 6.18.54 7.42-.85 1.58-1.54 2.82-3.07 3.75zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+						آیفون
+					</div>
+					<div class="flex flex-col gap-1.5">
+						<a href="https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-gray-400 dark:hover:border-gray-500 transition shadow-sm"><span>V2Box</span><span class="text-gray-500 text-[12px]">📥</span></a>
+						<a href="https://apps.apple.com/us/app/streisand/id6450534064" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-gray-400 dark:hover:border-gray-500 transition shadow-sm"><span>Streisand</span><span class="text-gray-500 text-[12px]">📥</span></a>
+						<a href="https://apps.apple.com/us/app/npv-tunnel/id1629465476" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-gray-400 dark:hover:border-gray-500 transition shadow-sm"><span>NapsternetV</span><span class="text-gray-500 text-[12px]">📥</span></a>
+						<a href="https://apps.apple.com/us/app/happ-proxy-utility/id6504287215" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-gray-400 dark:hover:border-gray-500 transition shadow-sm"><span>happ</span><span class="text-gray-500 text-[12px]">📥</span></a>
+						<a href="https://apps.apple.com/us/app/hiddify-proxy-vpn/id6596777532" target="_blank" class="flex justify-between items-center bg-white dark:bg-amoled-card border border-gray-100 dark:border-zinc-800 px-2 py-1.5 rounded text-[10px] font-semibold text-gray-700 dark:text-zinc-300 hover:border-gray-400 dark:hover:border-gray-500 transition shadow-sm"><span>Hiddify</span><span class="text-gray-500 text-[12px]">📥</span></a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<div id="qr-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 opacity-0 pointer-events-none transition-opacity duration-200 ease-out">
+	<div id="qr-modal-card" class="w-full max-w-sm bg-white dark:bg-amoled-card border border-gray-200 dark:border-amoled-border rounded-md shadow-2xl p-6 transform transition-all scale-95 opacity-0 duration-200 text-center">
+		<div class="flex justify-between items-center mb-4">
+			<h3 class="text-lg font-bold text-gray-900 dark:text-white">QR Code</h3>
+			<button onclick="toggleQrModal(false)" class="p-1.5 rounded-md bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-500 hover:bg-red-100 dark:hover:bg-red-900/50 transition-all duration-200 shadow-sm">
+				<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+			</button>
+		</div>
+		<div class="flex justify-center bg-gray-100 dark:bg-amoled-bg p-4 rounded-md mb-4 border border-gray-200 dark:border-zinc-800">
+			<div id="qrcode-container"></div>
+		</div>
+		<button onclick="downloadQrCode()" class="w-full py-2.5 bg-transparent border-2 border-green-600 text-green-700 hover:bg-green-900/20 hover:text-green-800 dark:border-green-500 dark:text-green-500 dark:hover:bg-green-900/40 dark:hover:text-green-400 font-bold rounded-md text-sm transition duration-200 shadow-sm flex items-center justify-center gap-2">
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+			دانلود تصویر QR
+		</button>
+	</div>
+</div>
+<div class="flex flex-col gap-4 mt-6 relative z-10">
+	<div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-center">
+		
+		
+	</div>
+	<div class="flex flex-wrap items-center gap-3 sm:gap-4 justify-center">
+		
+		
+	</div>
+</div>
+
+	<script>
+		/* {{USER_DATA_PLACEHOLDER}} */
+		
+		function getHost() {
+			return window.location.host;
+		}
+		/* v1.0.6: real panel domain - an IP typed in the browser never leaks into links */
+		function lmlHostSafe() {
+			try {
+				if (window.LML_PANEL_HOST && window.LML_PANEL_HOST.length) return window.LML_PANEL_HOST;
+			} catch (e) { }
+			var h = window.location.hostname || '';
+			if (/^[0-9.]+$/.test(h)) { try { if (window.LML_PANEL_HOST) return window.LML_PANEL_HOST; } catch (e) { } }
+			return h || 'workers.dev';
+		}
+		function lmlHttpTwinPort(p) {
+			var m = { '443': '80', '2053': '2052', '2083': '2082', '2087': '2086', '2096': '2095', '8443': '8080' };
+			return m[String(p)] || '80';
+		}
+		function getvIeesLink() {
+			const u = window.statusUser;
+			if (!u) return '';
+			const host = lmlHostSafe();
+			/* TLS links always use the domain; IPs only on plain-HTTP ports -> no SSL error ever */
+			var ips = [host];
+			var cleanIps = [];
+			if (Array.isArray(u.ips_valid)) cleanIps = u.ips_valid.slice(0, 40);
+			var ports = String(u.port || '443').split(',').map(function(p) { return p.trim(); }).filter(function(p) { return p.length > 0; });
+			/* TLS-ONLY: keep encrypted (TLS) ports only; never leave the list empty */
+			var STATUS_TLS_PORTS = ["443", "2053", "2083", "2087", "2096", "8443"];
+			var tlsOnlyPorts = ports.filter(function(p) { return STATUS_TLS_PORTS.indexOf(p) >= 0; });
+			ports = tlsOnlyPorts.length ? tlsOnlyPorts : ["443"];
+			var fpPoolSt = ['chrome', 'firefox', 'safari', 'ios', 'android', 'edge', '360', 'qq'];
+			var fpRawSt = String(u.fingerprint || 'chrome').toLowerCase();
+			var fp = (fpRawSt === 'random' || fpRawSt === 'randomized') ? fpPoolSt[Math.floor(Math.random() * fpPoolSt.length)] : (u.fingerprint || 'chrome');
+			const dynPath = encodeURIComponent("/stream/LML_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default"));
+			const links = [];
+			const m1 = decodeURIComponent('%E2%9A%A0%EF%B8%8F%D9%BE%D9%86%D9%84%20%D8%B1%D8%A7%DB%8C%DA%AF%D8%A7%D9%86%20%D9%88%20%D8%BA%DB%8C%D8%B1%20%D9%82%D8%A7%D8%A8%D9%84%20%D9%81%D8%B1%D9%88%D8%B4%E2%9A%A0%EF%B8%8F');
+			const m2 = '💎 TAJ-CONNECT ❯ [SECURE-MESH]';
+			let remVol = "Unlimited";
+			if (u.limit_gb) {
+				let rem = u.limit_gb - (u.used_gb || 0);
+				remVol = rem > 0 ? rem.toFixed(2) + "GB" : "0GB";
+			}
+			let remTime = "Unlimited";
+			if (u.expiry_days && u.created_at) {
+				const created = new Date(u.created_at);
+				const expiryDate = new Date(created.getTime() + u.expiry_days * 24 * 60 * 60 * 1000);
+				const diffDays = Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+				remTime = diffDays > 0 ? diffDays + "Days" : "0Days";
+			}
+			let remReq = "Unlimited";
+			if (u.limit_req) {
+				let rem = u.limit_req - (u.used_req || 0);
+				remReq = rem > 0 ? rem.toLocaleString() + "Req" : "0Req";
+			}
+			const infoRemark = "📊 remaining | \u200E" + remVol + " | \u200E" + remTime + " | \u200E" + remReq;
+			const rawPath = "/stream/LML_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default");
+			let proxyList = [];
+			try {
+				if (u.user_socks5 && u.user_socks5.trim().startsWith("[")) {
+					proxyList = JSON.parse(u.user_socks5);
+				} else if (u.user_socks5 || u.user_proxy_ip) {
+					proxyList = [u.user_socks5 || u.user_proxy_ip];
+				} else {
+					proxyList = [null];
+				}
+			} catch (e) {
+				proxyList = [u.user_socks5 || u.user_proxy_ip];
+			}
+			if (!Array.isArray(proxyList) || proxyList.length === 0) proxyList = [];
+			const allowDirect = u.enable_direct !== 0;
+			if (allowDirect) {
+				let hasDirect = proxyList.some(function(p) { return p === null || p === ""; });
+				if (!hasDirect) proxyList.push(null);
+			} else {
+				proxyList = proxyList.filter(function(p) { return p !== null && p !== ""; });
+			}
+			if (proxyList.length === 0) proxyList = [null];
+			let proxyFlagCache = {};
+			try { proxyFlagCache = JSON.parse(localStorage.getItem('proxy_flag_cache_v2') || '{}'); } catch(e) {}
+			let resolvedProxies = [];
+			for (let locIdx = 0; locIdx < proxyList.length; locIdx++) {
+				let proxyItem = proxyList[locIdx];
+				let proxyStr = typeof proxyItem === "object" && proxyItem !== null ? proxyItem.proxy : proxyItem;
+				let countryCode = typeof proxyItem === "object" && proxyItem !== null ? proxyItem.country : (u.user_proxy_iata || "");
+				let flagEmoji = "🌐";
+				if (countryCode && typeof getFlagEmojiText === 'function') {
+					flagEmoji = getFlagEmojiText(countryCode);
+				} else if (proxyStr && proxyFlagCache[proxyStr] && typeof getFlagEmojiText === 'function') {
+					flagEmoji = getFlagEmojiText(proxyFlagCache[proxyStr]);
+				}
+				const currentDynPath = encodeURIComponent(rawPath + ((proxyItem !== null && proxyItem !== "") ? "/loc-" + locIdx : ""));
+				resolvedProxies.push({ flagEmoji, currentDynPath });
+			}
+			const userConnType = String(u.connection_type || 'vless').toLowerCase();
+			const enableVless = userConnType.includes('vless') || userConnType === 'vl' + 'e' + 'ss' || (!userConnType.includes('trojan') && !userConnType.includes('shadowsocks'));
+			const enableTrojan = userConnType.includes('trojan');
+			const enableSS = userConnType.includes('shadowsocks');
+			/* v1.0.0-FINAL: بدون فیلتر — همهٔ آی‌پی‌ها در کانفیگ می‌مانند */
+			var tlsIpsSt2 = cleanIps.slice();
+			var lmlEntries = [];
+			tlsIpsSt2.forEach(function (cip) { ports.forEach(function (p) { lmlEntries.push({ addr: cip, port: p, tls: true, ip: cip }); }); });
+			ips.forEach(function (hh) { ports.forEach(function (p) { lmlEntries.push({ addr: hh, port: p, tls: true, ip: '' }); }); });
+			lmlEntries.forEach((entry) => {
+				resolvedProxies.forEach((proxy) => {
+						const ip = entry.addr;
+						const ipU = String(ip).indexOf(':') >= 0 ? '[' + ip + ']' : ip;
+						const portStr = entry.port;
+						const isTlsPort = entry.tls;
+						const tlsVal = isTlsPort ? "tls" : "none";
+						const isChainedSt = String(proxy.currentDynPath).indexOf("loc-") >= 0;
+						const chainFlagSt = (isChainedSt && proxy.flagEmoji && proxy.flagEmoji !== "🌐") ? (proxy.flagEmoji + " ") : "";
+						const ipPartSt = entry.ip ? (entry.ip + " ") : "";
+						let userFrag = "";
+						if (u.frag_len && u.frag_int) userFrag += "&fragment=" + encodeURIComponent(u.frag_len + "," + u.frag_int + (isTlsPort ? ",tlshello" : ""));
+						if (u.advanced_frag) userFrag += "&fm=" + encodeURIComponent(u.advanced_frag);
+						if (isTlsPort && u.cipher_suites) userFrag += "&cs=" + encodeURIComponent(u.cipher_suites);
+						if (u.tls_mask) userFrag += "&mask=" + encodeURIComponent(u.tls_mask);
+						
+						const insecureFlag = (isTlsPort && entry.ip) ? "1" : "0";
+						const tlsParams = isTlsPort ? ("&insecure=" + insecureFlag + "&fp=" + fp + "&allowInsecure=" + insecureFlag + "&sni=" + host) : "";
+
+						if (enableVless) {
+							const remark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							links.push('vle' + 'ss://' + (u.uuid || '') + '@' + ipU + ':' + portStr + '?path=' + proxy.currentDynPath + '&security=' + tlsVal + '&encryption=none&host=' + host + '&type=ws' + tlsParams + userFrag + '#' + encodeURIComponent(remark));
+						}
+						if (enableTrojan) {
+							const trojanRemark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							links.push('trojan://' + (u.uuid || '') + '@' + ipU + ':' + portStr + '?path=' + proxy.currentDynPath + '&security=' + tlsVal + '&host=' + host + '&type=ws' + tlsParams + userFrag + '#' + encodeURIComponent(trojanRemark));
+						}
+						if (enableSS) {
+							const ssRemark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							const methodPass = btoa("aes-256-gcm:" + (u.uuid || ''));
+							let pluginOpts = "v2ray-plugin;mode=websocket;host=" + host + ";path=" + decodeURIComponent(proxy.currentDynPath) + (isTlsPort ? ";tls" : "");
+							let pluginStr = encodeURIComponent(pluginOpts);
+							links.push("ss://" + methodPass + "@" + ipU + ":" + portStr + "/?plugin=" + pluginStr + "#" + encodeURIComponent(ssRemark));
+						}
+					});
+				});
+			return links.join('\\n');
+		}
+		function copyvIeesConfig() {
+				lmlCopy(getvIeesLink() || '');
+		}
+		function copyTextSub() {
+			const link = window.location.protocol + '//' + lmlHostSafe() + '/sub/' + encodeURIComponent(window.statusUser.username);
+			lmlCopy(link);
+		}
+		function copySingboxSub() {
+			const link = window.location.protocol + '//' + lmlHostSafe() + '/singbox/' + encodeURIComponent(window.statusUser.username);
+			lmlCopy(link);
+		}
+		function toggleQrModal(show, text) {
+			const modal = document.getElementById('qr-modal');
+			const card = document.getElementById('qr-modal-card');
+			const container = document.getElementById('qrcode-container');
+			if (show) {
+				container.innerHTML = '';
+				const qrCode = new QRCodeStyling({
+					width: 280,
+					height: 280,
+					data: text,
+					margin: 5,
+					qrOptions: { errorCorrectionLevel: 'L' },
+					dotsOptions: {
+						color: "#000000",
+						type: "square"
+					},
+					backgroundOptions: {
+						color: "#ffffff"
+					},
+					cornersSquareOptions: {
+						color: "#000000",
+						type: "square"
+					},
+					cornersDotOptions: {
+						color: "#000000",
+						type: "square"
+					}
+				});
+				qrCode.append(container);
+				modal.classList.remove('opacity-0', 'pointer-events-none');
+				modal.classList.add('opacity-100', 'pointer-events-auto');
+				card.classList.remove('opacity-0', 'scale-95');
+				card.classList.add('opacity-100', 'scale-100');
+			} else {
+				modal.classList.remove('opacity-100', 'pointer-events-auto');
+				modal.classList.add('opacity-0', 'pointer-events-none');
+				card.classList.remove('opacity-100', 'scale-100');
+				card.classList.add('opacity-0', 'scale-95');
+			}
+		}
+		function downloadQrCode() {
+			const container = document.getElementById('qrcode-container');
+			if (!container) return;
+			const canvas = container.querySelector('canvas');
+			const img = container.querySelector('img');
+			let dataUrl = '';
+			if (canvas) {
+				dataUrl = canvas.toDataURL("image/png");
+			} else if (img && img.src) {
+				dataUrl = img.src;
+			}
+			if (!dataUrl) {
+				alert('⚠️ تصویر QR برای دانلود یافت نشد!');
+				return;
+			}
+			const downloadAnchor = document.createElement('a');
+			downloadAnchor.href = dataUrl;
+			downloadAnchor.download = "lml_qrcode_" + Date.now() + ".png";
+			document.body.appendChild(downloadAnchor);
+			downloadAnchor.click();
+			downloadAnchor.remove();
+		}
+		function showSubQr() {
+			const link = window.location.protocol + '//' + getHost() + '/sub/' + encodeURIComponent(window.statusUser.username);
+			toggleQrModal(true, link);
+		}
+		function showSingboxQr() {
+			const link = window.location.protocol + '//' + getHost() + '/singbox/' + encodeURIComponent(window.statusUser.username);
+			toggleQrModal(true, link);
+		}
+		function getFlagEmoji(countryCode) {
+			if (!countryCode) return '<span class="lml-flag-globe">🌐</span>';
+			const cc = String(countryCode).toLowerCase().replace(/[^a-z]/g, '');
+			if (cc.length !== 2) return '<span class="lml-flag-globe">🌐</span>';
+			return '<span class="fi fi-' + cc + ' lml-flag" title="' + cc.toUpperCase() + '"></span>';
+		}
+		function getFlagEmojiText(countryCode) {
+			if (!countryCode) return '🌐';
+			const cc = String(countryCode).toUpperCase().replace(/[^A-Z]/g, '');
+			if (cc.length !== 2) return '🌐';
+			try {
+				return String.fromCodePoint(...cc.split('').map(char => 127397 + char.charCodeAt(0)));
+			} catch (e) {
+				return '🌐';
+			}
+		}
+		document.addEventListener('DOMContentLoaded', () => {
+			const u = window.statusUser;
+			if (!u) return;
+			const limit = u.ip_limit !== undefined ? u.ip_limit : u.max_connections;
+			document.getElementById('display-username').innerText = u.username;
+const flagContainer = document.getElementById('display-flag');
+	if (u.user_proxy_iata) {
+		const flag = getFlagEmoji(u.user_proxy_iata);
+		flagContainer.innerHTML = flag + " " + u.user_proxy_iata.toUpperCase();
+		flagContainer.style.display = 'block';
+} else if (u.user_socks5 || u.user_proxy_ip) {
+	flagContainer.style.display = 'block';
+	let proxyList = [];
+	try {
+		if (u.user_socks5 && u.user_socks5.trim().startsWith("[")) {
+			proxyList = JSON.parse(u.user_socks5);
+		} else {
+			proxyList = [u.user_socks5 || u.user_proxy_ip];
+		}
+	} catch(e) {
+		proxyList = [u.user_socks5 || u.user_proxy_ip];
+	}
+	let initialFlags = proxyList.map(item => {
+		let targetProxy = typeof item === 'object' && item !== null ? item.proxy : item;
+		let targetCountry = typeof item === 'object' && item !== null ? item.country : null;
+		if (targetCountry) return getFlagEmoji(targetCountry);
+		try {
+			const proxyFlagCache = JSON.parse(localStorage.getItem('proxy_flag_cache_v2') || '{}');
+			const cached = proxyFlagCache[targetProxy];
+			if (cached && typeof cached === 'string' && /^[a-zA-Z]{2}$/.test(cached)) return getFlagEmoji(cached);
+		} catch(e) {}
+		return '⏳';
+	});
+	flagContainer.innerHTML = initialFlags.join(' ');
+	Promise.all(proxyList.map((item, index) => {
+		let targetProxy = typeof item === 'object' && item !== null ? item.proxy : item;
+		let targetCountry = typeof item === 'object' && item !== null ? item.country : null;
+		if (targetCountry) return Promise.resolve(getFlagEmoji(targetCountry));
+		try {
+			const proxyFlagCache = JSON.parse(localStorage.getItem('proxy_flag_cache_v2') || '{}');
+			const cached = proxyFlagCache[targetProxy];
+			if (cached && typeof cached === 'string' && /^[a-zA-Z]{2}$/.test(cached)) return Promise.resolve(getFlagEmoji(cached));
+		} catch(e) {}
+		return fetch('/api/test-proxy', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ proxy: targetProxy })
+		})
+		.then(res => res.json())
+		.then(data => {
+			if (data.success && data.country) {
+				const flagSvg = getFlagEmoji(data.country);
+				try {
+					const cache = JSON.parse(localStorage.getItem('proxy_flag_cache_v2') || '{}');
+					cache[targetProxy] = data.country.toUpperCase();
+					localStorage.setItem('proxy_flag_cache_v2', JSON.stringify(cache));
+				} catch(e) {}
+				return flagSvg;
+			}
+			return '<span class="lml-flag-globe">🌐</span>';
+		})
+		.catch(() => '<span class="lml-flag-globe">🌐</span>');
+	})).then(flags => {
+		flagContainer.innerHTML = flags.join(' ');
+	});
+}
+			const badge = document.getElementById('live-connections-badge');
+			badge.classList.remove('hidden');
+			if (u.online_count && u.online_count > 0) {
+				document.getElementById('live-connections-text').innerText = u.online_count + (limit ? '/' + limit : '') + ' دستگاه متصل';
+				badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-green-600/10 border border-green-600/20 text-green-600 rounded-full text-xs font-bold shadow-sm';
+				badge.querySelector('span.w-2').className = 'w-2 h-2 rounded-full bg-green-600 animate-pulse';
+			} else {
+				document.getElementById('live-connections-text').innerText = '۰ دستگاه متصل';
+				badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-gray-500/10 border border-gray-500/20 text-gray-500 dark:text-zinc-400 rounded-full text-xs font-bold shadow-sm';
+				badge.querySelector('span.w-2').className = 'w-2 h-2 rounded-full bg-gray-500';
+			}
+			const usedGb = u.used_gb || 0;
+			const limitGb = u.limit_gb;
+			const formattedUsed = usedGb < 1 ? (usedGb * 1024).toFixed(0) + ' MB' : usedGb.toFixed(2) + ' GB';
+			document.getElementById('used-vol').innerText = formattedUsed;
+			let isVolumeExpired = false;
+			if (limitGb) {
+				document.getElementById('limit-vol').innerText = limitGb + ' GB';
+				const pct = Math.min((usedGb / limitGb) * 100, 100);
+				document.getElementById('volume-pct').innerText = pct.toFixed(0) + '٪';
+				document.getElementById('volume-progress').style.width = pct + '%';
+				const hue = 120 - (pct * 1.2);
+				document.getElementById('volume-progress').style.backgroundColor = 'hsl(' + hue + ', 80%, 45%)';
+				if (usedGb >= limitGb) isVolumeExpired = true;
+			} else {
+				document.getElementById('limit-vol').innerText = 'نامحدود';
+				document.getElementById('volume-pct').innerText = '۰٪';
+				document.getElementById('volume-progress').style.width = '100%';
+				document.getElementById('volume-progress').style.backgroundColor = '#3b82f6';
+			}
+			let daysRemaining = 'نامحدود';
+			let totalDays = 'نامحدود';
+			let isTimeExpired = false;
+			if (u.expiry_days) {
+				totalDays = u.expiry_days + ' روز';
+				if (u.start_on_first_connect === 1 && !u.first_connection_time) {
+					daysRemaining = u.expiry_days + ' روز (شروع از اولین اتصال)';
+					document.getElementById('expiry-pct').innerText = '۱۰۰٪';
+					document.getElementById('expiry-progress').style.width = '100%';
+					document.getElementById('expiry-progress').style.backgroundColor = '#3b82f6';
+				} else if (u.start_on_first_connect === 1 && u.first_connection_time) {
+					const expiryDate = new Date(u.first_connection_time + (u.expiry_days * 86400000));
+					const diffDays = Math.ceil((expiryDate - new Date()) / (86400000));
+					daysRemaining = (diffDays > 0 ? diffDays : 0) + ' روز';
+					const pct = Math.max(0, Math.min(100, (Math.max(0, diffDays) / u.expiry_days) * 100));
+					document.getElementById('expiry-pct').innerText = pct.toFixed(0) + '٪';
+					document.getElementById('expiry-progress').style.width = pct + '%';
+					const hue = pct * 1.2;
+					document.getElementById('expiry-progress').style.backgroundColor = 'hsl(' + hue + ', 80%, 45%)';
+					if (new Date() > expiryDate) isTimeExpired = true;
+				} else if (u.created_at) {
+					const created = new Date(u.created_at);
+					const expiryDate = new Date(created.getTime() + (u.expiry_days * 86400000));
+					const diffDays = Math.ceil((expiryDate - new Date()) / (86400000));
+					daysRemaining = (diffDays > 0 ? diffDays : 0) + ' روز';
+					const pct = Math.max(0, Math.min(100, (Math.max(0, diffDays) / u.expiry_days) * 100));
+					document.getElementById('expiry-pct').innerText = pct.toFixed(0) + '٪';
+					document.getElementById('expiry-progress').style.width = pct + '%';
+					const hue = pct * 1.2;
+					document.getElementById('expiry-progress').style.backgroundColor = 'hsl(' + hue + ', 80%, 45%)';
+					if (new Date() > expiryDate) isTimeExpired = true;
+				}
+			} else {
+				document.getElementById('expiry-pct').innerText = '۰٪';
+				document.getElementById('expiry-progress').style.width = '100%';
+				document.getElementById('expiry-progress').style.backgroundColor = '#3b82f6';
+			}
+			document.getElementById('days-remaining').innerText = daysRemaining === 'نامحدود' ? 'نامحدود' : (daysRemaining.includes('روز') ? daysRemaining : daysRemaining + ' روز');
+			document.getElementById('total-days').innerText = totalDays;
+			const usedReq = u.used_req || 0;
+			const limitReq = u.limit_req;
+			document.getElementById('used-req').innerText = usedReq.toLocaleString();
+			let isReqExpired = false;
+			if (limitReq) {
+				document.getElementById('limit-req').innerText = limitReq.toLocaleString();
+				const rPct = Math.min((usedReq / limitReq) * 100, 100);
+				document.getElementById('req-pct').innerText = rPct.toFixed(0) + '٪';
+				document.getElementById('req-progress').style.width = rPct + '%';
+				const rHue = 120 - (rPct * 1.2);
+				document.getElementById('req-progress').style.backgroundColor = 'hsl(' + rHue + ', 80%, 45%)';
+				if (usedReq >= limitReq) isReqExpired = true;
+			} else {
+				document.getElementById('limit-req').innerText = 'نامحدود';
+				document.getElementById('req-pct').innerText = '۰٪';
+				document.getElementById('req-progress').style.width = '100%';
+				document.getElementById('req-progress').style.backgroundColor = '#3b82f6';
+			}
+			const onlineCount = u.online_count || 0;
+			document.getElementById('online-count').innerText = onlineCount;
+			if (limit) {
+				document.getElementById('limit-online').innerText = limit;
+				const oPct = Math.min((onlineCount / limit) * 100, 100);
+				document.getElementById('online-pct').innerText = oPct.toFixed(0) + '٪';
+				document.getElementById('online-progress').style.width = oPct + '%';
+				const oHue = 120 - (oPct * 1.2);
+				document.getElementById('online-progress').style.backgroundColor = 'hsl(' + oHue + ', 80%, 45%)';
+			} else {
+				document.getElementById('limit-online').innerText = 'نامحدود';
+				document.getElementById('online-pct').innerText = '۰٪';
+				document.getElementById('online-progress').style.width = '100%';
+				document.getElementById('online-progress').style.backgroundColor = onlineCount > 0 ? '#16a34a' : '#9ca3af'; 
+			}
+			const statusCard = document.getElementById('status-card');
+			const statusText = document.getElementById('status-text');
+			if (u.is_active === 0) {
+				statusCard.className = 'mb-6 rounded-md p-4 text-center border font-bold relative z-10 bg-red-500/10 border-red-500/30 text-red-500 shadow-md shadow-red-500/5';
+				statusCard.style.boxShadow = 'inset 0 0 12px rgba(239, 68, 68, 0.1)';
+				statusText.innerText = '❌ وضعیت اشتراک: غیرفعال / مسدود دستی';
+			} else if (isVolumeExpired || isReqExpired || isTimeExpired) {
+				statusCard.className = 'mb-6 rounded-md p-4 text-center border font-bold relative z-10 bg-yellow-500/10 border-yellow-500/30 text-yellow-500 shadow-md shadow-yellow-500/5';
+				if (isVolumeExpired) statusText.innerText = '⚠️ وضعیت اشتراک: تمام شدن حجم مجاز';
+				else if (isReqExpired) statusText.innerText = '📈 وضعیت اشتراک: تمام شدن ریکوئست مجاز';
+				else if (isTimeExpired) statusText.innerText = '⏳ وضعیت اشتراک: منقضی شده (پایان زمان اعتبار)';
+			} else {
+				statusCard.className = 'mb-6 rounded-md p-4 text-center border font-bold relative z-10 bg-green-600/10 border-green-600/30 text-green-600 shadow-md shadow-green-600/5';
+				statusText.innerText = '✅ وضعیت اشتراک: فعال و متصل';
+			}
+		});
+		// TAJ 1-Click App Deep Links & Live Ping Test
+		try {
+			const lmlPageHost = window.LML_PANEL_HOST ? (location.protocol + '//' + window.LML_PANEL_HOST) : window.location.origin;
+			const currentSubUrl = lmlPageHost + '/sub/' + (typeof u !== 'undefined' && u.name ? u.name : window.location.pathname.split('/').pop());
+			const v2Btn = document.getElementById('btn-v2rayng');
+			if (v2Btn) v2Btn.href = 'v2rayng://install-config?url=' + encodeURIComponent(currentSubUrl);
+			const hidBtn = document.getElementById('btn-hiddify');
+			if (hidBtn) hidBtn.href = 'hiddify://install-sub?url=' + encodeURIComponent(currentSubUrl);
+			const strBtn = document.getElementById('btn-streisand');
+			if (strBtn) strBtn.href = 'streisand://import/' + encodeURIComponent(currentSubUrl);
+			const sbBtn = document.getElementById('btn-singbox');
+			if (sbBtn) sbBtn.href = 'sing-box://import-remote-profile?url=' + encodeURIComponent(currentSubUrl);
+		} catch(e) {}
+
+		window.testLiveStatusPing = async function() {
+			const btn = document.getElementById('status-ping-btn');
+			if (!btn) return;
+			btn.disabled = true;
+			const originalText = btn.innerHTML;
+			btn.innerHTML = '⚡ در حال تست...';
+			const t0 = performance.now();
+			try {
+				await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+				const ms = Math.round(performance.now() - t0);
+				btn.innerHTML = ms < 150 ? ('🟢 ' + ms + ' ms') : ('🟡 ' + ms + ' ms');
+			} catch(err) {
+				btn.innerHTML = '🟢 سرور فعال است';
+			}
+			setTimeout(() => {
+				btn.disabled = false;
+				btn.innerHTML = '⚡ تست مجدد پینگ';
+			}, 3000);
+		};
+
+		window.addEventListener('click', (e) => {
+			if (e.target.id === 'qr-modal') toggleQrModal(false);
+		});
+
+		/* ---- شبکه crowd: تست بی‌صدا و یک‌بار مصرف آی‌پی‌ها از نت خود کاربر ----
+		   نتیجه فقط به‌صورت تجمیعی در پنل مدیر دیده می‌شود؛ هیچ دادهٔ شخصی ذخیره نمی‌شود. */
+		(function () {
+			try {
+				var uC = window.statusUser || {};
+				var ipsC = Array.isArray(uC.crowd_ips) ? uC.crowd_ips.slice(0, 6) : [];
+				if (!ipsC.length) return;
+				var resultsC = [];
+				var idxC = 0;
+				function probeNextC() {
+					if (idxC >= ipsC.length) { sendReportsC(); return; }
+					var ipC = ipsC[idxC++];
+					var t0C = Date.now();
+					var doneC = false;
+					var timerC = setTimeout(function () { if (!doneC) { doneC = true; resultsC.push({ ip: ipC, ok: 0, ms: 2800 }); probeNextC(); } }, 2800);
+					function finishC() {
+						if (doneC) return;
+						doneC = true;
+						clearTimeout(timerC);
+						var msC = Date.now() - t0C;
+						resultsC.push({ ip: ipC, ok: (msC >= 60 && msC < 2600) ? 1 : 0, ms: msC });
+						setTimeout(probeNextC, 350);
+					}
+					try {
+						fetch('https://' + ipC + ':443/lml-crowd', { mode: 'no-cors', cache: 'no-store' }).then(finishC).catch(finishC);
+					} catch (eC) { finishC(); }
+				}
+				function sendReportsC() {
+					if (!resultsC.length) return;
+					try {
+						fetch('/api/crowd-probe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reports: resultsC }) }).catch(function () { });
+					} catch (eC2) { }
+				}
+				function startProbesC() {
+					if (document.visibilityState !== 'visible') return;
+					setTimeout(probeNextC, 2500);
+				}
+				if (document.readyState === 'complete') startProbesC();
+				else window.addEventListener('load', startProbesC);
+			} catch (eC3) { }
+		})();
+	</script>
+	
+<script>
+(function(){
+var button=document.createElement('button');button.textContent='تازه‌های نسخه';button.style.cssText='display:none;position:fixed;bottom:18px;left:18px;z-index:1000;background:#4f7cff;color:white;border:0;border-radius:12px;padding:12px 18px;font:inherit;cursor:pointer';document.body.appendChild(button);
+var box=document.createElement('dialog');box.dir='rtl';box.style.cssText='background:#0f1116;color:#e7e9ef;border:1px solid #343c4b;border-radius:18px;padding:24px;max-width:90vw;width:480px;line-height:2';document.body.appendChild(box);var release;
+button.onclick=function(){if(!release)return;box.replaceChildren();var title=document.createElement('h3');title.textContent='چه چیزهایی در نسخه '+release.version+' جدید است؟';box.appendChild(title);var ul=document.createElement('ul');release.notes.forEach(function(n){var li=document.createElement('li');li.textContent=n;ul.appendChild(li);});box.appendChild(ul);var close=document.createElement('button');close.textContent='متوجه شدم';close.style.cssText='background:#4f7cff;color:white;padding:8px 16px;border-radius:8px;border:0;cursor:pointer';close.onclick=function(){try{localStorage.setItem('lml.portal.release',release.build||release.version);}catch(e){}box.close();button.style.display='none';};box.appendChild(close);box.showModal();};
+async function check(){try{var r=await fetch('/lml-scanner/release',{cache:'no-store'});if(!r.ok)return;var j=await r.json();if(typeof j.version!=='string'||!Array.isArray(j.notes))return;release=j;var seen='';try{seen=localStorage.getItem('lml.portal.release')||'';}catch(e){}button.textContent='تازه‌های نسخه '+j.version;button.style.display=seen===(j.build||j.version)?'none':'block';}catch(e){}}
+check();setInterval(check,300000);document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="dark">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>پورتال نمایندگان — TAJPANEL</title>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+	<script>
+		window.GLOBAL_GFX = "/*{{GFX_SETTING}}*/";
+		if (window.GLOBAL_GFX === 'false' || (window.GLOBAL_GFX.startsWith('/*') && localStorage.getItem('gfx-enabled') !== 'true')) {
+			document.documentElement.classList.add('gfx-off');
+		}
+		if (localStorage.getItem('color-theme') === 'light' && window.location.pathname === '/panel') {
+			document.documentElement.classList.remove('dark');
+		} else {
+			document.documentElement.classList.add('dark');
+		}
+		if (localStorage.getItem('grayscale-theme') === 'true') {
+			document.documentElement.classList.add('grayscale-active');
+		}
+		try { localStorage.removeItem('proxy_flag_cache'); } catch(e) {}
+	</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+	<link rel="manifest" href="/manifest.json">
+	<link rel="icon" type="image/svg+xml" href="/icon.svg">
+	<link rel="apple-touch-icon" href="/icon-192.png">
+	<meta name="theme-color" content="#060913">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="TAJPANEL">
+	<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+<script>
+	if (typeof tailwind !== 'undefined') { tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+				colors: { amoled: { bg: '#060913', card: '#0d1526', input: '#0a1220', border: 'rgba(148, 163, 255, 0.13)' } }
+			}
+		}
+	}
+}
+</script>
+<style>
+	.cursor-wrapper {
+		pointer-events: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999;
+		display: none;
+	}
+	.hidden {
+		display: none !important;
+	}
+	
+	/* TAJPANEL High-Contrast Styles for Modals */
+	#user-modal input[type="text"],
+	#user-modal input[type="number"],
+	#user-modal input[type="password"],
+	#user-modal textarea,
+	#user-modal select,
+	#bulk-modal input,
+	#warp-modal textarea,
+	#telegram-modal input {
+		color: #0f172a !important;
+		background-color: #ffffff !important;
+		border: 1.5px solid #94a3b8 !important;
+		font-weight: 700 !important;
+	}
+	.dark #user-modal input[type="text"],
+	.dark #user-modal input[type="number"],
+	.dark #user-modal input[type="password"],
+	.dark #user-modal textarea,
+	.dark #user-modal select,
+	.dark #bulk-modal input,
+	.dark #warp-modal textarea,
+	.dark #telegram-modal input {
+		color: #ffffff !important;
+		background-color: rgba(4, 10, 24, 0.55) !important;
+		border: 1.5px solid rgba(129, 116, 255, 0.5) !important;
+		font-weight: 700 !important;
+	}
+	#user-modal input::placeholder,
+	#user-modal textarea::placeholder {
+		color: #64748b !important;
+		opacity: 1 !important;
+	}
+	.dark #user-modal input::placeholder,
+	.dark #user-modal textarea::placeholder {
+		color: #94a3b8 !important;
+		opacity: 1 !important;
+	}
+
+	/* Standard cursor for Windows and all platforms */
+	*, *::before, *::after {
+		cursor: auto !important;
+	}
+	a, button, input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], select, [role="button"], .cursor-pointer, .btn, label {
+		cursor: pointer !important;
+	}
+	input[type="text"], input[type="password"], input[type="number"], textarea {
+		cursor: text !important;
+	}
+	.cursor-wrapper, #cursor-dot, #cursor-ring-pos, #cursor-glow-pos {
+		display: none !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+	#cursor-dot {
+		width: 6px;
+		height: 6px;
+		background-color: #2563eb;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #2563eb, 0 0 16px #1d4ed8;
+		transform: translate(-50%, -50%);
+	}
+	#cursor-ring-pos {
+		width: 36px;
+		height: 36px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	#cursor-ring-visual {
+		width: 100%;
+		height: 100%;
+		border: 1.5px dashed rgba(37, 99, 235, 0.9);
+		border-radius: 50%;
+		animation: spinRing 10s linear infinite;
+		transition: border-color 0.2s, background-color 0.2s;
+	}
+	@keyframes spinRing {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	body.hover-active #cursor-ring-pos {
+		width: 48px;
+		height: 48px;
+	}
+	body.hover-active #cursor-ring-visual {
+		border: 2px solid #2563eb;
+		background-color: rgba(37, 99, 235, 0.2);
+		animation: spinRingFast 3s linear infinite;
+	}
+	@keyframes spinRingFast {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	#cursor-glow-pos {
+		width: 40px;
+		height: 40px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	body.hover-active #cursor-glow-pos {
+		width: 54px;
+		height: 54px;
+	}
+	#cursor-glow-visual {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.1) 40%, transparent 70%);
+	}
+		:root {
+			--bg-tint: rgba(59, 130, 246, 0.03);
+			--plane-color: #93c5fd; 
+			--plane-dark: #f9fafb;
+			--plane-opacity: 0.20;
+		}
+		.dark {
+			--bg-tint: rgba(16, 32, 64, 0.4); 
+			--plane-color: #1d4ed8; 
+			--plane-dark: #000105;
+			--plane-opacity: 0.15;
+		}
+		.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+		#waves { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+		.vignette {
+			position: fixed; inset: 0; z-index: 2; pointer-events: none;
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(255,255,255,0.5) 100%);
+		}
+		.dark .vignette {
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(0,1,5,0.85) 100%);
+		}
+		.ambient {
+			position: fixed; inset: 0; z-index: 1; pointer-events: none;
+			background:
+				radial-gradient(700px 500px at 12% 20%, var(--bg-tint), transparent 60%),
+				radial-gradient(800px 600px at 90% 90%, var(--bg-tint), transparent 60%);
+		}
+</style>
+	<style>
+	/* ---- Aurora Glass theme ---- */
+	html.dark { background: #060913; --bg-tint: rgba(99, 102, 241, 0.06); --plane-color: #6366f1; --plane-dark: #060913; --plane-opacity: 0.35; }
+	html.dark body { background: #060913; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+	html.dark:not(.gfx-off) body::before {
+		content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+		background:
+			radial-gradient(900px 620px at 8% -2%, rgba(99,102,241,0.17), transparent 60%),
+			radial-gradient(820px 540px at 96% 6%, rgba(34,211,238,0.10), transparent 55%),
+			radial-gradient(780px 560px at 90% 94%, rgba(217,70,239,0.08), transparent 60%),
+			radial-gradient(660px 500px at 10% 96%, rgba(59,130,246,0.10), transparent 55%);
+	}
+	html.dark [class*="bg-amoled-card"] {
+		background-color: rgba(13, 21, 38, 0.60) !important;
+		backdrop-filter: blur(16px) saturate(1.25);
+		-webkit-backdrop-filter: blur(16px) saturate(1.25);
+	}
+	html.dark [class*="bg-amoled-input"] { background-color: rgba(3, 8, 20, 0.50) !important; }
+	html.dark [class*="bg-amoled-bg"] { background-color: rgba(6, 9, 19, 0.60) !important; }
+	html.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+	html.dark ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+	html.dark ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #22d3ee); border-radius: 999px; }
+	html.dark ::selection { background: rgba(99, 102, 241, 0.45); color: #fff; }
+	html.dark [class~="bg-blue-600"] { background-color: #5754ee; }
+	html.dark [class~="hover:bg-blue-600"]:hover { background-color: #4643d8; }
+	html.dark [class~="bg-blue-500"] { background-color: #6157f5; }
+	html.dark [class~="text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="text-blue-500"] { color: #8e97fb; }
+	html.dark [class~="text-blue-600"] { color: #837cf9; }
+	html.dark [class~="dark:text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="border-blue-500"], html.dark [class~="dark:border-blue-500"] { border-color: rgba(124, 116, 255, 0.5); }
+	html.dark [class~="border-blue-600"] { border-color: rgba(124, 116, 255, 0.55); }
+	html.dark [class~="bg-blue-100"] { background-color: rgba(99, 102, 241, 0.15); }
+	html.dark [class~="dark:bg-blue-900\/30"] { background-color: rgba(87, 84, 238, 0.16); }
+	html.dark [class~="dark:hover:bg-blue-900\/40"]:hover { background-color: rgba(87, 84, 238, 0.24); }
+	html.dark [class~="focus:ring-blue-500"]:focus, html.dark [class~="focus:ring-blue-500\/50"]:focus { --tw-ring-color: rgba(124, 116, 255, 0.4) !important; }
+	html.dark [class~="focus:border-blue-500"]:focus { border-color: rgba(124, 116, 255, 0.6) !important; }
+	</style>
+<!-- Native System Cursor Active Everywhere -->
+	<style>
+		* { cursor: default !important; }
+		a, button, input, select, label { cursor: pointer !important; }
+		input[type="text"], input[type="password"], input[type="number"] { cursor: text !important; }
+		body { font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+		.glass-panel {
+			background: rgba(10, 22, 40, 0.75);
+			border: 1px solid rgba(59, 130, 246, 0.2);
+			backdrop-filter: blur(12px);
+		}
+		.glass-card {
+			background: rgba(15, 30, 55, 0.65);
+			border: 1px solid rgba(59, 130, 246, 0.25);
+			backdrop-filter: blur(8px);
+		}
+	</style>
+</head>
+<body class="bg-[#060913] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+	
+
+	<!-- Top Bar -->
+	<header class="border-b border-blue-900/40 bg-[#0d1526]/80 backdrop-blur-md sticky top-0 z-40">
+		<div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+			<div class="flex items-center gap-3">
+				<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-500/30">
+					⚡
+				</div>
+				<div>
+					<span class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">TAJPANEL</span>
+					<span class="text-[10px] sm:text-xs text-blue-400/80 block sm:inline font-bold sm:mr-2">پورتال اختصاصی نمایندگان</span>
+				</div>
+			</div>
+			
+			<div id="header-user-section" class="flex items-center gap-2 sm:gap-3 hidden">
+				<div class="px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-bold text-blue-300 flex items-center gap-1.5">
+					<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+					<span id="header-reseller-name">همکار</span>
+				</div>
+				<button type="button" onclick="refreshResellerData()" title="بروزرسانی داده‌ها" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 transition">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+				</button>
+				<button type="button" onclick="handleResellerLogout()" class="px-2.5 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/30 border border-rose-500/30 text-rose-300 text-xs font-bold transition flex items-center gap-1">
+					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+					<span class="hidden sm:inline">خروج</span>
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<!-- Main Content Area -->
+	<main class="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
+		
+		<!-- LOGIN SCREEN (Shown if not logged in) -->
+		<div id="reseller-login-view" class="max-w-md mx-auto my-12 glass-panel p-6 sm:p-8 rounded-2xl shadow-2xl border border-blue-500/30 hidden">
+			<div class="text-center mb-6">
+				<div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-2xl font-black text-white shadow-xl shadow-blue-500/30 mb-3">
+					⚡
+				</div>
+				<h2 class="text-xl font-extrabold text-white">ورود به پورتال نمایندگان</h2>
+				<p class="text-xs text-slate-400 mt-1">مدیریت سهمیه، کاربران و صدور کانفیگ اختصاصی</p>
+				<div class="mt-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-center">
+					<div class="text-sm font-black text-emerald-300">این پنل رایگان است 🎁</div>
+					<div class="text-[11px] text-slate-400 mt-1">استفاده از TAJPANEL برای همه آزاد و بدون هزینه است.</div>
+				</div>
+			</div>
+
+			<form onsubmit="handleResellerLogin(event)" class="space-y-4">
+				<div>
+					<label class="block text-xs font-bold text-slate-300 mb-1.5">نام کاربری نماینده</label>
+					<input type="text" id="login-username" required placeholder="نام کاربری شما" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-blue-500 text-white text-xs outline-none transition font-mono">
+				</div>
+
+				<div>
+					<label class="block text-xs font-bold text-slate-300 mb-1.5">رمز عبور</label>
+					<input type="password" id="login-password" required placeholder="رمز عبور" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700 focus:border-blue-500 text-white text-xs outline-none transition font-mono">
+				</div>
+
+				<div id="login-error-msg" class="text-xs text-rose-400 font-bold hidden py-1 text-center"></div>
+
+				<button type="submit" id="btn-login-submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-black shadow-lg shadow-blue-500/25 transition">
+					ورود به پورتال
+				</button>
+			</form>
+		</div>
+
+		<!-- DASHBOARD SCREEN (Shown when logged in) -->
+		<div id="reseller-dashboard-view" class="space-y-6 hidden">
+			
+			<!-- Hero Quota Status Cards -->
+			<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+				<!-- Stat 1: Total Credit -->
+				<div class="glass-card p-4 rounded-xl relative overflow-hidden">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-xs font-bold text-blue-400">کل سهمیه ترافیک</span>
+						<span class="text-base">💎</span>
+					</div>
+					<div class="text-xl sm:text-2xl font-black text-white font-mono">
+						<span id="stat-credit">0</span> <span class="text-xs font-normal text-slate-400">GB</span>
+					</div>
+					<span class="text-[10px] text-slate-400 mt-1 block">ترافیک اختصاص‌یافته</span>
+				</div>
+
+				<!-- Stat 2: Used Traffic -->
+				<div class="glass-card p-4 rounded-xl relative overflow-hidden">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-xs font-bold text-amber-400">مصرف کل کاربران</span>
+						<span class="text-base">⚡</span>
+					</div>
+					<div class="text-xl sm:text-2xl font-black text-amber-300 font-mono">
+						<span id="stat-used">0</span> <span class="text-xs font-normal text-slate-400">GB</span>
+					</div>
+					<span class="text-[10px] text-slate-400 mt-1 block">حجم مصرفی کسر شده</span>
+				</div>
+
+				<!-- Stat 3: Remaining Traffic -->
+				<div class="glass-card p-4 rounded-xl relative overflow-hidden border-emerald-500/40">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-xs font-bold text-emerald-400">سهمیه باقیمانده شما</span>
+						<span class="text-base">💾</span>
+					</div>
+					<div class="text-xl sm:text-2xl font-black text-emerald-400 font-mono">
+						<span id="stat-rem">0</span> <span class="text-xs font-normal text-slate-400">GB</span>
+					</div>
+					<div class="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
+						<div id="stat-progress-bar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+					</div>
+				</div>
+
+				<!-- Stat 4: Active Users -->
+				<div class="glass-card p-4 rounded-xl relative overflow-hidden">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-xs font-bold text-purple-400">ظرفیت کاربران</span>
+						<span class="text-base">👥</span>
+					</div>
+					<div class="text-xl sm:text-2xl font-black text-purple-300 font-mono">
+						<span id="stat-active-users">0</span> / <span id="stat-max-users">0</span>
+					</div>
+					<span class="text-[10px] text-slate-400 mt-1 block">کاربران فعال / سقف مجاز</span>
+				</div>
+			</div>
+
+			<!-- Quick Actions Bar -->
+			<div class="glass-panel p-4 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+				<div class="flex items-center gap-2">
+					<button type="button" onclick="openCreateConfigModal()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+						<span>➕ ساخت کانفیگ جدید برای مشتری</span>
+					</button>
+				</div>
+
+				<!-- Search Input -->
+				<div class="relative w-full sm:w-64">
+					<span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+					</span>
+					<input type="text" id="users-search-box" oninput="filterResellerUsers()" placeholder="جستجوی مشتری..." class="w-full pl-3 pr-9 py-2 bg-slate-900/80 border border-slate-700 rounded-xl focus:border-blue-500 text-xs font-semibold text-white placeholder-slate-500 outline-none transition">
+				</div>
+			</div>
+
+			<!-- Customer List Table -->
+			<div class="glass-panel rounded-xl overflow-hidden shadow-xl">
+				<div class="px-4 py-3 border-b border-blue-900/30 flex items-center justify-between bg-slate-900/40">
+					<div class="flex items-center gap-2">
+						<span class="w-2 h-2 rounded-full bg-blue-500"></span>
+						<h3 class="text-xs font-black text-white">فهرست کانفیگ‌های مشتریان شما</h3>
+					</div>
+					<span class="text-[11px] font-bold text-slate-400">تعداد: <b id="users-count-badge" class="text-blue-400 font-mono">0</b></span>
+				</div>
+
+				<div class="overflow-x-auto">
+					<table class="w-full text-right border-collapse text-xs">
+						<thead>
+							<tr class="border-b border-slate-800 bg-slate-900/60 text-slate-400 font-bold">
+								<th class="p-3 text-center w-12">#</th>
+								<th class="p-3">نام کاربری</th>
+								<th class="p-3">وضعیت</th>
+								<th class="p-3">حجم مصرفی / سقف</th>
+								<th class="p-3">مدت اعتبار</th>
+								<th class="p-3 text-center">عملیات سریع مشتری</th>
+							</tr>
+						</thead>
+						<tbody id="reseller-users-tbody" class="divide-y divide-slate-800/60 font-medium">
+							<!-- Dynamic Rows -->
+						</tbody>
+					</table>
+				</div>
+
+				<div id="no-users-state" class="p-8 text-center hidden">
+					<p class="text-xs text-slate-400">هیچ کانفیگی ایجاد نشده است. روی دکمه «ساخت کانفیگ جدید» کلیک کنید.</p>
+				</div>
+			</div>
+
+		</div>
+
+	</main>
+
+	<!-- MODAL: CREATE CONFIG -->
+	<div id="create-config-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+		<div class="w-full max-w-lg glass-panel bg-[#0d1526] border border-blue-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+			<div class="px-6 py-4 border-b border-blue-900/40 flex justify-between items-center bg-slate-900/50">
+				<h3 class="font-extrabold text-white text-sm flex items-center gap-2">
+					<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+					ساخت کانفیگ جدید برای مشتری
+				</h3>
+				<button type="button" onclick="closeCreateConfigModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+			</div>
+
+			<form onsubmit="handleCreateConfigSubmit(event)" class="p-6 space-y-4 overflow-y-auto">
+				<!-- Username -->
+				<div>
+					<div class="flex items-center justify-between mb-1.5">
+						<label class="block text-xs font-bold text-slate-300">نام کاربری مشتری</label>
+						<button type="button" onclick="generateResellerRandomUsername()" class="text-[11px] text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1">
+							🎲 نام تصادفی
+						</button>
+					</div>
+					<input type="text" id="cfg-username" required placeholder="lml_customer" dir="ltr" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 text-white text-xs font-mono outline-none transition">
+				</div>
+
+				<!-- Package Presets -->
+				<div>
+					<label class="block text-xs font-bold text-slate-300 mb-1.5">انتخاب سریع پکیج:</label>
+					<div class="grid grid-cols-3 gap-2">
+						<button type="button" onclick="applyResellerPreset(30, 30, 'برنزی')" class="py-2 px-2 bg-amber-600/15 hover:bg-amber-600/30 border border-amber-500/40 text-amber-400 rounded-xl text-xs font-bold transition text-center shadow-sm">🥉 ۳۰G / ۳۰ روز</button>
+						<button type="button" onclick="applyResellerPreset(60, 60, 'نقره‌ای')" class="py-2 px-2 bg-slate-400/15 hover:bg-slate-400/30 border border-slate-400/40 text-slate-300 rounded-xl text-xs font-bold transition text-center shadow-sm">🥈 ۶۰G / ۶۰ روز</button>
+						<button type="button" onclick="applyResellerPreset(100, 90, 'طلایی')" class="py-2 px-2 bg-yellow-500/15 hover:bg-yellow-500/30 border border-yellow-500/40 text-yellow-400 rounded-xl text-xs font-bold transition text-center shadow-sm">🥇 ۱۰۰G / ۹۰ روز</button>
+					</div>
+				</div>
+
+				<!-- Custom Traffic and Expiry -->
+				<div class="grid grid-cols-2 gap-3">
+					<div>
+						<label class="block text-xs font-bold text-slate-300 mb-1.5">حجم مجاز (GB)</label>
+						<input type="number" step="0.5" min="0.5" id="cfg-traffic" required placeholder="مثلاً 30" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 text-white text-xs font-mono outline-none transition">
+					</div>
+					<div>
+						<label class="block text-xs font-bold text-slate-300 mb-1.5">مدت زمان (روز)</label>
+						<input type="number" min="1" id="cfg-days" required placeholder="مثلاً 30" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 text-white text-xs font-mono outline-none transition">
+					</div>
+				</div>
+
+				<!-- Quota Deduction Notice -->
+				<div class="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[11px] text-blue-300 font-medium">
+					💡 ساخت این کانفیگ از سهمیه باقیمانده شما کسر می‌شود. سهمیه آزاد فعلی: <b id="cfg-modal-rem-credit" class="text-white font-mono">0 GB</b>
+				</div>
+
+				<!-- Submit Button -->
+				<div class="pt-2">
+					<button type="submit" id="btn-submit-config" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs shadow-lg shadow-emerald-500/25 transition">
+						🚀 ساخت کانفیگ و تحویل به مشتری
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- MODAL: CONFIG RESULT & QR CODE -->
+	<div id="config-result-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden">
+		<div class="w-full max-w-md glass-panel bg-[#0d1526] border border-emerald-500/40 rounded-2xl shadow-2xl p-6 text-center space-y-4">
+			<div class="w-12 h-12 mx-auto rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-2xl text-emerald-400">
+				✅
+			</div>
+			<h3 class="text-sm font-black text-white">کانفیگ مشتری با موفقیت ساخته شد!</h3>
+			
+			<div id="reseller-qrcode-container" class="flex justify-center my-3 bg-white p-3 rounded-xl mx-auto w-[180px] h-[180px]"></div>
+
+			<div class="space-y-2">
+				<label class="block text-right text-[11px] font-bold text-slate-300">لینک سابسکریپشن اتصال:</label>
+				<input type="text" id="result-sub-url-input" readonly dir="ltr" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs font-mono text-emerald-400 outline-none select-all">
+			</div>
+
+			<div class="grid grid-cols-2 gap-2 pt-2">
+				<button type="button" onclick="copyResultSubUrl()" class="py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center justify-center gap-1">
+					📋 کپی لینک
+				</button>
+				<a id="btn-open-client-status" href="#" target="_blank" class="py-2 px-3 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-300 font-bold text-xs transition flex items-center justify-center gap-1">
+					🌐 صفحه مشتری
+				</a>
+			</div>
+
+			<button type="button" onclick="closeConfigResultModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition">
+				بستن
+			</button>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<footer class="border-t border-blue-900/30 bg-[#060913] py-4 text-center text-[11px] text-slate-500">
+		TAJPANEL — سیستم نمایندگی و زیرساخت ابری اختصاصی
+	</footer>
+
+	<script>
+		let currentResellerData = null;
+		let resellerUsersList = [];
+
+		async function initResellerPortal() {
+			try {
+				const res = await fetch('/api/session', { credentials: 'same-origin' });
+				const data = await res.json();
+				if (data && (data.role === 'reseller' || data.role === 'admin')) {
+					currentResellerData = data;
+					showDashboard(data);
+					loadResellerUsers();
+				} else {
+					showLogin();
+				}
+			} catch(e) {
+				showLogin();
+			}
+		}
+
+		function showLogin() {
+			document.getElementById('reseller-login-view').classList.remove('hidden');
+			document.getElementById('reseller-dashboard-view').classList.add('hidden');
+			document.getElementById('header-user-section').classList.add('hidden');
+		}
+
+		function showDashboard(data) {
+			document.getElementById('reseller-login-view').classList.add('hidden');
+			document.getElementById('reseller-dashboard-view').classList.remove('hidden');
+			document.getElementById('header-user-section').classList.remove('hidden');
+			
+			const rName = data.username || 'همکار';
+			document.getElementById('header-reseller-name').textContent = rName;
+			
+			const credit = parseFloat(data.credit_gb || 0).toFixed(2);
+			const used = parseFloat(data.used_gb || 0).toFixed(2);
+			const rem = parseFloat(data.rem_gb || Math.max(0, credit - used)).toFixed(2);
+			
+			document.getElementById('stat-credit').textContent = credit;
+			document.getElementById('stat-used').textContent = used;
+			document.getElementById('stat-rem').textContent = rem;
+			document.getElementById('cfg-modal-rem-credit').textContent = rem + ' GB';
+			
+			const pct = credit > 0 ? Math.min(100, Math.round((used / credit) * 100)) : 0;
+			const pBar = document.getElementById('stat-progress-bar');
+			if (pBar) {
+				pBar.style.width = pct + '%';
+				if (pct > 80) pBar.className = 'bg-rose-500 h-1.5 rounded-full';
+				else if (pct > 50) pBar.className = 'bg-amber-500 h-1.5 rounded-full';
+				else pBar.className = 'bg-emerald-500 h-1.5 rounded-full';
+			}
+
+			document.getElementById('stat-active-users').textContent = String(data.active_users || 0);
+			document.getElementById('stat-max-users').textContent = String(data.max_users || 'نامحدود');
+		}
+
+		async function refreshResellerData() {
+			try {
+				const res = await fetch('/api/session', { credentials: 'same-origin' });
+				const data = await res.json();
+				if (data && (data.role === 'reseller' || data.role === 'admin')) {
+					currentResellerData = data;
+					showDashboard(data);
+					showToast('✅ آمار سهمیه بروز شد');
+				}
+				await loadResellerUsers();
+			} catch(e) {}
+		}
+
+		async function handleResellerLogin(e) {
+			e.preventDefault();
+			const uInput = document.getElementById('login-username').value.trim();
+			const pInput = document.getElementById('login-password').value.trim();
+			const errBox = document.getElementById('login-error-msg');
+			const submitBtn = document.getElementById('btn-login-submit');
+
+			errBox.classList.add('hidden');
+			submitBtn.disabled = true;
+			submitBtn.innerText = 'در حال بررسی...';
+
+			try {
+				const res = await fetch('/api/login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ username: uInput, password: pInput })
+				});
+				const d = await res.json();
+				if (res.ok && d.success) {
+					await initResellerPortal();
+				} else {
+					errBox.innerText = d.error || 'نام کاربری یا رمز عبور اشتباه است.';
+					errBox.classList.remove('hidden');
+				}
+			} catch(err) {
+				errBox.innerText = 'خطا در برقراری ارتباط با سرور.';
+				errBox.classList.remove('hidden');
+			} finally {
+				submitBtn.disabled = false;
+				submitBtn.innerText = 'ورود به پورتال';
+			}
+		}
+
+		async function handleResellerLogout() {
+			try {
+				await fetch('/api/logout', { method: 'POST' });
+			} catch(e) {}
+			window.location.href = '/reseller';
+		}
+
+		async function loadResellerUsers() {
+			try {
+				const res = await fetch('/api/users?t=' + Date.now(), { credentials: 'same-origin' });
+				const data = await res.json();
+				const users = Array.isArray(data) ? data : (data.users || []);
+				resellerUsersList = users;
+				renderUsersTable(users);
+			} catch(e) {
+				console.error('Error loading users:', e);
+			}
+		}
+
+		function renderUsersTable(users) {
+			const tbody = document.getElementById('reseller-users-tbody');
+			const noUsers = document.getElementById('no-users-state');
+			const countBadge = document.getElementById('users-count-badge');
+			
+			countBadge.textContent = String(users.length);
+			tbody.innerHTML = '';
+
+			if (!users || users.length === 0) {
+				noUsers.classList.remove('hidden');
+				return;
+			}
+			noUsers.classList.add('hidden');
+
+			users.forEach((u, idx) => {
+				const tr = document.createElement('tr');
+				tr.className = 'hover:bg-slate-800/40 transition border-b border-slate-800/40';
+				
+				const limitGb = u.limit_gb ? parseFloat(u.limit_gb).toFixed(1) : 'نامحدود';
+				const usedGb = parseFloat(u.used_gb || 0).toFixed(2);
+				const subUrl = lmlPanelOrigin() + '/sub/' + encodeURIComponent(u.username);
+				const statusUrl = lmlPanelOrigin() + '/status/' + encodeURIComponent(u.username);
+				
+				const isActive = u.is_active === 1;
+				const statusBadge = isActive 
+					? '<span class="px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">فعال</span>'
+					: '<span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[10px] font-bold">غیرفعال</span>';
+
+				tr.innerHTML = 
+					'<td class="p-3 text-center text-slate-500 font-mono">' + (idx + 1) + '</td>' +
+					'<td class="p-3 font-bold text-white font-mono">' + u.username + '</td>' +
+					'<td class="p-3">' + statusBadge + '</td>' +
+					'<td class="p-3 font-mono text-slate-300">' + usedGb + ' / ' + limitGb + ' GB</td>' +
+					'<td class="p-3 text-slate-300">' + (u.expiry_days ? u.expiry_days + ' روز' : 'نامحدود') + '</td>' +
+					'<td class="p-3 text-center">' +
+						'<div class="flex items-center justify-center gap-1.5">' +
+							'<button type="button" onclick="copyClientSub(\\'' + subUrl + '\\')" class="p-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 text-[11px] font-bold transition" title="کپی لینک ساب">📋 کپی</button>' +
+							'<a href="' + statusUrl + '" target="_blank" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-400 border border-indigo-500/30 text-[11px] font-bold transition" title="مشاهده صفحه مشتری">🌐 وضعیت</a>' +
+							'<button type="button" onclick="deleteResellerUser(\\'' + u.username + '\\')" class="p-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/40 text-rose-400 border border-rose-500/30 text-[11px] font-bold transition" title="حذف کاربر">🗑️</button>' +
+						'</div>' +
+					'</td>';
+				
+				tbody.appendChild(tr);
+			});
+		}
+
+		function filterResellerUsers() {
+			const q = document.getElementById('users-search-box').value.toLowerCase().trim();
+			if (!q) {
+				renderUsersTable(resellerUsersList);
+				return;
+			}
+			const filtered = resellerUsersList.filter(u => u.username.toLowerCase().includes(q));
+			renderUsersTable(filtered);
+		}
+
+		function openCreateConfigModal() {
+			generateResellerRandomUsername();
+			applyResellerPreset(30, 30, 'برنزی');
+			document.getElementById('create-config-modal').classList.remove('hidden');
+		}
+
+		function closeCreateConfigModal() {
+			document.getElementById('create-config-modal').classList.add('hidden');
+		}
+
+		function generateResellerRandomUsername() {
+			const rnd = Math.random().toString(36).substring(2, 8);
+			document.getElementById('cfg-username').value = 'lml_' + rnd;
+		}
+
+		function applyResellerPreset(gb, days, name) {
+			document.getElementById('cfg-traffic').value = gb;
+			document.getElementById('cfg-days').value = days;
+		}
+
+		async function handleCreateConfigSubmit(e) {
+			e.preventDefault();
+			const uname = document.getElementById('cfg-username').value.trim();
+			const traf = parseFloat(document.getElementById('cfg-traffic').value);
+			const days = parseInt(document.getElementById('cfg-days').value);
+			const btn = document.getElementById('btn-submit-config');
+
+			if (!uname || isNaN(traf) || isNaN(days)) {
+				alert('لطفاً تمامی فیلدها را به درستی وارد فرمایید.');
+				return;
+			}
+
+			// Pre-check quota
+			if (currentResellerData && currentResellerData.rem_gb) {
+				const rem = parseFloat(currentResellerData.rem_gb);
+				if (traf > rem) {
+					alert('⚠️ اعتبار حجم شما کافی نیست! سهمیه باقی‌مانده: ' + rem + ' GB');
+					return;
+				}
+			}
+
+			btn.disabled = true;
+			btn.innerText = 'در حال ساخت کانفیگ...';
+
+			try {
+				const res = await fetch('/api/users', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						username: uname,
+						limit_gb: traf,
+						expiry_days: days,
+						protocols: ['vless', 'trojan']
+					})
+				});
+				const d = await res.json();
+				if (res.ok && (d.success || d.username || d.uuid)) {
+					closeCreateConfigModal();
+					showConfigResultModal(uname);
+					await refreshResellerData();
+				} else {
+					alert('❌ خطا در ساخت کانفیگ: ' + (d.error || 'خطای نامشخص'));
+				}
+			} catch(err) {
+				alert('❌ خطای ارتباط با سرور.');
+			} finally {
+				btn.disabled = false;
+				btn.innerText = '🚀 ساخت کانفیگ و تحویل به مشتری';
+			}
+		}
+
+		function showConfigResultModal(uname) {
+			const subUrl = lmlPanelOrigin() + '/sub/' + encodeURIComponent(uname);
+			const statusUrl = lmlPanelOrigin() + '/status/' + encodeURIComponent(uname);
+			
+			document.getElementById('result-sub-url-input').value = subUrl;
+			document.getElementById('btn-open-client-status').href = statusUrl;
+			
+			// Render QR code
+			const qrContainer = document.getElementById('reseller-qrcode-container');
+			qrContainer.innerHTML = '';
+			try {
+				const qrCode = new QRCodeStyling({
+					width: 170,
+					height: 170,
+					type: "svg",
+					data: subUrl,
+					dotsOptions: { color: "#060f1d", type: "rounded" },
+					backgroundOptions: { color: "#ffffff" }
+				});
+				qrCode.append(qrContainer);
+			} catch(e) {}
+
+			document.getElementById('config-result-modal').classList.remove('hidden');
+		}
+
+		function closeConfigResultModal() {
+			document.getElementById('config-result-modal').classList.add('hidden');
+		}
+
+		function copyResultSubUrl() {
+			const url = document.getElementById('result-sub-url-input').value;
+			if (typeof lmlCopy === 'function') { lmlCopy(url); return; }
+			navigator.clipboard.writeText(url).then(function () { showToast('OK'); }).catch(function () { });
+		}
+
+		function copyClientSub(url) {
+			if (typeof lmlCopy === 'function') { lmlCopy(url); return; }
+			navigator.clipboard.writeText(url).then(function () { showToast('OK'); }).catch(function () { });
+		}
+
+		async function deleteResellerUser(uname) {
+			if (!confirm('آیا از حذف مشتری ' + uname + ' اطمینان دارید؟ با حذف کاربر، سهمیه حجم به حساب شما بازمی‌گردد.')) {
+				return;
+			}
+			try {
+				const res = await fetch('/api/users/' + encodeURIComponent(uname), { method: 'DELETE' });
+				if (res.ok) {
+					showToast('✅ کاربر حذف و حجم آزاد شد.');
+					await refreshResellerData();
+				} else {
+					alert('خطا در حذف کاربر.');
+				}
+			} catch(e) {
+				alert('خطای ارتباط با سرور.');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', initResellerPortal);
+	</script>
+	
+</body>
+</html>

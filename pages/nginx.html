@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>TAJPANEL — زیرساخت اختصاصی</title>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+	<script>
+		window.GLOBAL_GFX = "/*{{GFX_SETTING}}*/";
+		if (window.GLOBAL_GFX === 'false' || (window.GLOBAL_GFX.startsWith('/*') && localStorage.getItem('gfx-enabled') !== 'true')) {
+			document.documentElement.classList.add('gfx-off');
+		}
+		if (localStorage.getItem('color-theme') === 'light' && window.location.pathname === '/panel') {
+			document.documentElement.classList.remove('dark');
+		} else {
+			document.documentElement.classList.add('dark');
+		}
+		if (localStorage.getItem('grayscale-theme') === 'true') {
+			document.documentElement.classList.add('grayscale-active');
+		}
+		try { localStorage.removeItem('proxy_flag_cache'); } catch(e) {}
+	</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+	<link rel="manifest" href="/manifest.json">
+	<link rel="icon" type="image/svg+xml" href="/icon.svg">
+	<link rel="apple-touch-icon" href="/icon-192.png">
+	<meta name="theme-color" content="#060913">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="TAJPANEL">
+	<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.3.2/css/flag-icons.min.css">
+<script>
+	if (typeof tailwind !== 'undefined') { tailwind.config = {
+		darkMode: 'class',
+		theme: {
+			extend: {
+				fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+				colors: { amoled: { bg: '#060913', card: '#0d1526', input: '#0a1220', border: 'rgba(148, 163, 255, 0.13)' } }
+			}
+		}
+	}
+}
+</script>
+<style>
+	.cursor-wrapper {
+		pointer-events: none;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 9999;
+		display: none;
+	}
+	.hidden {
+		display: none !important;
+	}
+	
+	/* TAJPANEL High-Contrast Styles for Modals */
+	#user-modal input[type="text"],
+	#user-modal input[type="number"],
+	#user-modal input[type="password"],
+	#user-modal textarea,
+	#user-modal select,
+	#bulk-modal input,
+	#warp-modal textarea,
+	#telegram-modal input {
+		color: #0f172a !important;
+		background-color: #ffffff !important;
+		border: 1.5px solid #94a3b8 !important;
+		font-weight: 700 !important;
+	}
+	.dark #user-modal input[type="text"],
+	.dark #user-modal input[type="number"],
+	.dark #user-modal input[type="password"],
+	.dark #user-modal textarea,
+	.dark #user-modal select,
+	.dark #bulk-modal input,
+	.dark #warp-modal textarea,
+	.dark #telegram-modal input {
+		color: #ffffff !important;
+		background-color: rgba(4, 10, 24, 0.55) !important;
+		border: 1.5px solid rgba(129, 116, 255, 0.5) !important;
+		font-weight: 700 !important;
+	}
+	#user-modal input::placeholder,
+	#user-modal textarea::placeholder {
+		color: #64748b !important;
+		opacity: 1 !important;
+	}
+	.dark #user-modal input::placeholder,
+	.dark #user-modal textarea::placeholder {
+		color: #94a3b8 !important;
+		opacity: 1 !important;
+	}
+
+	/* Standard cursor for Windows and all platforms */
+	*, *::before, *::after {
+		cursor: auto !important;
+	}
+	a, button, input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], select, [role="button"], .cursor-pointer, .btn, label {
+		cursor: pointer !important;
+	}
+	input[type="text"], input[type="password"], input[type="number"], textarea {
+		cursor: text !important;
+	}
+	.cursor-wrapper, #cursor-dot, #cursor-ring-pos, #cursor-glow-pos {
+		display: none !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+	#cursor-dot {
+		width: 6px;
+		height: 6px;
+		background-color: #2563eb;
+		border-radius: 50%;
+		box-shadow: 0 0 8px #2563eb, 0 0 16px #1d4ed8;
+		transform: translate(-50%, -50%);
+	}
+	#cursor-ring-pos {
+		width: 36px;
+		height: 36px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	#cursor-ring-visual {
+		width: 100%;
+		height: 100%;
+		border: 1.5px dashed rgba(37, 99, 235, 0.9);
+		border-radius: 50%;
+		animation: spinRing 10s linear infinite;
+		transition: border-color 0.2s, background-color 0.2s;
+	}
+	@keyframes spinRing {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	body.hover-active #cursor-ring-pos {
+		width: 48px;
+		height: 48px;
+	}
+	body.hover-active #cursor-ring-visual {
+		border: 2px solid #2563eb;
+		background-color: rgba(37, 99, 235, 0.2);
+		animation: spinRingFast 3s linear infinite;
+	}
+	@keyframes spinRingFast {
+		from { transform: rotate(0deg); }
+		to { transform: rotate(360deg); }
+	}
+	#cursor-glow-pos {
+		width: 40px;
+		height: 40px;
+		transform: translate(-50%, -50%);
+		transition: width 0.2s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+	body.hover-active #cursor-glow-pos {
+		width: 54px;
+		height: 54px;
+	}
+	#cursor-glow-visual {
+		width: 100%;
+		height: 100%;
+		border-radius: 50%;
+		background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, rgba(29, 78, 216, 0.1) 40%, transparent 70%);
+	}
+		:root {
+			--bg-tint: rgba(59, 130, 246, 0.03);
+			--plane-color: #93c5fd; 
+			--plane-dark: #f9fafb;
+			--plane-opacity: 0.20;
+		}
+		.dark {
+			--bg-tint: rgba(16, 32, 64, 0.4); 
+			--plane-color: #1d4ed8; 
+			--plane-dark: #000105;
+			--plane-opacity: 0.15;
+		}
+		.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+		#waves { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+		.vignette {
+			position: fixed; inset: 0; z-index: 2; pointer-events: none;
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(255,255,255,0.5) 100%);
+		}
+		.dark .vignette {
+			background: radial-gradient(ellipse at center, transparent 35%, rgba(0,1,5,0.85) 100%);
+		}
+		.ambient {
+			position: fixed; inset: 0; z-index: 1; pointer-events: none;
+			background:
+				radial-gradient(700px 500px at 12% 20%, var(--bg-tint), transparent 60%),
+				radial-gradient(800px 600px at 90% 90%, var(--bg-tint), transparent 60%);
+		}
+</style>
+	<style>
+	/* ---- Aurora Glass theme ---- */
+	html.dark { background: #060913; --bg-tint: rgba(99, 102, 241, 0.06); --plane-color: #6366f1; --plane-dark: #060913; --plane-opacity: 0.35; }
+	html.dark body { background: #060913; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+	html.dark:not(.gfx-off) body::before {
+		content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+		background:
+			radial-gradient(900px 620px at 8% -2%, rgba(99,102,241,0.17), transparent 60%),
+			radial-gradient(820px 540px at 96% 6%, rgba(34,211,238,0.10), transparent 55%),
+			radial-gradient(780px 560px at 90% 94%, rgba(217,70,239,0.08), transparent 60%),
+			radial-gradient(660px 500px at 10% 96%, rgba(59,130,246,0.10), transparent 55%);
+	}
+	html.dark [class*="bg-amoled-card"] {
+		background-color: rgba(13, 21, 38, 0.60) !important;
+		backdrop-filter: blur(16px) saturate(1.25);
+		-webkit-backdrop-filter: blur(16px) saturate(1.25);
+	}
+	html.dark [class*="bg-amoled-input"] { background-color: rgba(3, 8, 20, 0.50) !important; }
+	html.dark [class*="bg-amoled-bg"] { background-color: rgba(6, 9, 19, 0.60) !important; }
+	html.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+	html.dark ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.25); }
+	html.dark ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #6366f1, #22d3ee); border-radius: 999px; }
+	html.dark ::selection { background: rgba(99, 102, 241, 0.45); color: #fff; }
+	html.dark [class~="bg-blue-600"] { background-color: #5754ee; }
+	html.dark [class~="hover:bg-blue-600"]:hover { background-color: #4643d8; }
+	html.dark [class~="bg-blue-500"] { background-color: #6157f5; }
+	html.dark [class~="text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="text-blue-500"] { color: #8e97fb; }
+	html.dark [class~="text-blue-600"] { color: #837cf9; }
+	html.dark [class~="dark:text-blue-400"] { color: #a5adfa; }
+	html.dark [class~="border-blue-500"], html.dark [class~="dark:border-blue-500"] { border-color: rgba(124, 116, 255, 0.5); }
+	html.dark [class~="border-blue-600"] { border-color: rgba(124, 116, 255, 0.55); }
+	html.dark [class~="bg-blue-100"] { background-color: rgba(99, 102, 241, 0.15); }
+	html.dark [class~="dark:bg-blue-900\/30"] { background-color: rgba(87, 84, 238, 0.16); }
+	html.dark [class~="dark:hover:bg-blue-900\/40"]:hover { background-color: rgba(87, 84, 238, 0.24); }
+	html.dark [class~="focus:ring-blue-500"]:focus, html.dark [class~="focus:ring-blue-500\/50"]:focus { --tw-ring-color: rgba(124, 116, 255, 0.4) !important; }
+	html.dark [class~="focus:border-blue-500"]:focus { border-color: rgba(124, 116, 255, 0.6) !important; }
+	</style>
+<!-- Native System Cursor Active Everywhere -->
+	<style>
+		body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+		.hero-glow {
+			background: radial-gradient(circle at 50% 30%, rgba(37, 99, 235, 0.25), transparent 70%);
+		}
+		.grid-card {
+			background: rgba(10, 22, 40, 0.7);
+			border: 1px solid rgba(59, 130, 246, 0.2);
+			backdrop-filter: blur(12px);
+		}
+	</style>
+</head>
+<body class="bg-[#060913] text-slate-100 min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white" dir="ltr">
+
+	<!-- Top Navigation -->
+	<header class="border-b border-blue-900/30 bg-[#0d1526]/80 backdrop-blur-md sticky top-0 z-50">
+		<div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+			<div class="flex items-center gap-3">
+				<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-500/30">
+					⚡
+				</div>
+				<span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">TAJPANEL Cloud</span>
+				<span class="hidden sm:inline-block px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">Edge v2.5</span>
+			</div>
+			<nav class="flex items-center gap-4 text-xs font-semibold">
+				<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+					<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+					All Systems Operational
+				</span>
+				<a href="/panel" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-md shadow-blue-600/30 flex items-center gap-1.5">
+					<span>Client Portal</span>
+					<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+				</a>
+			</nav>
+		</div>
+	</header>
+
+	<!-- Hero Section -->
+	<main class="flex-1 hero-glow relative overflow-hidden flex flex-col items-center justify-center px-4 py-16 sm:py-24 text-center">
+		<div class="max-w-3xl mx-auto space-y-6 relative z-10">
+			<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-500/30 text-blue-300 text-xs font-semibold shadow-inner">
+				<span class="text-blue-400">🌐 Anycast Tier-1 Backbone</span>
+				<span class="text-slate-500">•</span>
+				<span id="global-ping">Latency: 18ms</span>
+			</div>
+			<h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight sm:leading-none">
+				Accelerated Enterprise Edge &amp; Intelligent CDN Infrastructure
+			</h1>
+			<p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+				Ultra-low latency content delivery, automated packet fragmentation, and DDoS mitigation powered by 320+ distributed points of presence worldwide.
+			</p>
+			<div class="flex flex-wrap items-center justify-center gap-3 pt-4">
+				<a href="/panel" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl text-sm transition shadow-xl shadow-blue-500/25 flex items-center gap-2">
+					<span>Launch Management Console</span>
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+				</a>
+				<button type="button" onclick="runEdgeLatencyTest()" id="latency-btn" class="px-5 py-3 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700 font-bold rounded-xl text-sm transition flex items-center gap-2">
+					<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+					<span id="latency-text">Live Latency Benchmark</span>
+				</button>
+			</div>
+		</div>
+
+		<!-- Edge Global POPs Telemetry -->
+		<div class="max-w-4xl w-full mx-auto mt-14 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+			<div class="grid-card p-4 rounded-xl">
+				<div class="text-[10px] text-slate-400 font-mono flex items-center justify-between">
+					<span>FRANKFURT (FRA)</span>
+					<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+				</div>
+				<div class="text-lg font-mono font-bold text-emerald-400 mt-1" id="pop-fra">14 ms</div>
+				<div class="text-[10px] text-slate-500">100 Gbps Port</div>
+			</div>
+			<div class="grid-card p-4 rounded-xl">
+				<div class="text-[10px] text-slate-400 font-mono flex items-center justify-between">
+					<span>AMSTERDAM (AMS)</span>
+					<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+				</div>
+				<div class="text-lg font-mono font-bold text-emerald-400 mt-1" id="pop-ams">18 ms</div>
+				<div class="text-[10px] text-slate-500">100 Gbps Port</div>
+			</div>
+			<div class="grid-card p-4 rounded-xl">
+				<div class="text-[10px] text-slate-400 font-mono flex items-center justify-between">
+					<span>LONDON (LHR)</span>
+					<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+				</div>
+				<div class="text-lg font-mono font-bold text-emerald-400 mt-1" id="pop-lhr">21 ms</div>
+				<div class="text-[10px] text-slate-500">100 Gbps Port</div>
+			</div>
+			<div class="grid-card p-4 rounded-xl">
+				<div class="text-[10px] text-slate-400 font-mono flex items-center justify-between">
+					<span>SINGAPORE (SIN)</span>
+					<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+				</div>
+				<div class="text-lg font-mono font-bold text-emerald-400 mt-1" id="pop-sin">72 ms</div>
+				<div class="text-[10px] text-slate-500">80 Gbps Port</div>
+			</div>
+		</div>
+	</main>
+
+	<!-- Footer -->
+	<footer class="border-t border-blue-950/60 bg-[#040a14] py-6 px-4 text-center text-xs text-slate-500">
+		<div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+			<div class="flex items-center gap-2">
+				<span class="font-bold text-slate-400">TAJ Edge Network Services</span>
+				<span>© 2026. All rights reserved.</span>
+			</div>
+			<div class="flex items-center gap-4 text-[11px]">
+				<span class="text-slate-400">Security SLA 99.99%</span>
+				<span>•</span>
+				<span class="text-slate-400">Zero-Trust Verified</span>
+				<span>•</span>
+				<a href="/panel" class="text-blue-400 hover:underline font-bold">Portal Access</a>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		function runEdgeLatencyTest() {
+			const btn = document.getElementById('latency-text');
+			if (btn) btn.innerText = 'Benchmarking...';
+			const start = performance.now();
+			fetch('/icon.svg?t=' + Date.now(), { cache: 'no-store' })
+				.then(() => {
+					const ping = Math.round(performance.now() - start);
+					if (btn) btn.innerText = 'RTT: ' + ping + ' ms (Optimal)';
+					const gp = document.getElementById('global-ping');
+					if (gp) gp.innerText = 'Latency: ' + ping + 'ms';
+				})
+				.catch(() => {
+					if (btn) btn.innerText = 'Ping benchmark finished';
+				});
+		}
+	</script>
+	
+</body>
+</html>
