@@ -242,7 +242,7 @@
 			background: rgba(10, 10, 10, 0.6);
 			border: 1px solid rgba(255, 255, 255, 0.05);
 		}
-		.lml-flag {
+		.taj-flag {
 			display: inline-block;
 			width: 1.35em;
 			height: 1em;
@@ -252,7 +252,7 @@
 			background-position: 50%;
 			background-repeat: no-repeat;
 		}
-		.lml-flag-globe {
+		.taj-flag-globe {
 			font-size: 1.1em;
 			line-height: 1;
 			vertical-align: -0.05em;
@@ -485,22 +485,22 @@
 			return window.location.host;
 		}
 		/* v1.0.6: real panel domain - an IP typed in the browser never leaks into links */
-		function lmlHostSafe() {
+		function tajHostSafe() {
 			try {
-				if (window.LML_PANEL_HOST && window.LML_PANEL_HOST.length) return window.LML_PANEL_HOST;
+				if (window.TAJ_PANEL_HOST && window.TAJ_PANEL_HOST.length) return window.TAJ_PANEL_HOST;
 			} catch (e) { }
 			var h = window.location.hostname || '';
-			if (/^[0-9.]+$/.test(h)) { try { if (window.LML_PANEL_HOST) return window.LML_PANEL_HOST; } catch (e) { } }
+			if (/^[0-9.]+$/.test(h)) { try { if (window.TAJ_PANEL_HOST) return window.TAJ_PANEL_HOST; } catch (e) { } }
 			return h || 'workers.dev';
 		}
-		function lmlHttpTwinPort(p) {
+		function tajHttpTwinPort(p) {
 			var m = { '443': '80', '2053': '2052', '2083': '2082', '2087': '2086', '2096': '2095', '8443': '8080' };
 			return m[String(p)] || '80';
 		}
 		function getvIeesLink() {
 			const u = window.statusUser;
 			if (!u) return '';
-			const host = lmlHostSafe();
+			const host = tajHostSafe();
 			/* TLS links always use the domain; IPs only on plain-HTTP ports -> no SSL error ever */
 			var ips = [host];
 			var cleanIps = [];
@@ -513,7 +513,7 @@
 			var fpPoolSt = ['chrome', 'firefox', 'safari', 'ios', 'android', 'edge', '360', 'qq'];
 			var fpRawSt = String(u.fingerprint || 'chrome').toLowerCase();
 			var fp = (fpRawSt === 'random' || fpRawSt === 'randomized') ? fpPoolSt[Math.floor(Math.random() * fpPoolSt.length)] : (u.fingerprint || 'chrome');
-			const dynPath = encodeURIComponent("/stream/LML_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default"));
+			const dynPath = encodeURIComponent("/stream/TAJ_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default"));
 			const links = [];
 			const m1 = decodeURIComponent('%E2%9A%A0%EF%B8%8F%D9%BE%D9%86%D9%84%20%D8%B1%D8%A7%DB%8C%DA%AF%D8%A7%D9%86%20%D9%88%20%D8%BA%DB%8C%D8%B1%20%D9%82%D8%A7%D8%A8%D9%84%20%D9%81%D8%B1%D9%88%D8%B4%E2%9A%A0%EF%B8%8F');
 			const m2 = '💎 TAJ-CONNECT ❯ [SECURE-MESH]';
@@ -535,7 +535,7 @@
 				remReq = rem > 0 ? rem.toLocaleString() + "Req" : "0Req";
 			}
 			const infoRemark = "📊 remaining | \u200E" + remVol + " | \u200E" + remTime + " | \u200E" + remReq;
-			const rawPath = "/stream/LML_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default");
+			const rawPath = "/stream/TAJ_PANEL/" + (u.uuid ? u.uuid.split("-")[4] : "default");
 			let proxyList = [];
 			try {
 				if (u.user_socks5 && u.user_socks5.trim().startsWith("[")) {
@@ -579,10 +579,10 @@
 			const enableSS = userConnType.includes('shadowsocks');
 			/* v1.0.0-FINAL: بدون فیلتر — همهٔ آی‌پی‌ها در کانفیگ می‌مانند */
 			var tlsIpsSt2 = cleanIps.slice();
-			var lmlEntries = [];
-			tlsIpsSt2.forEach(function (cip) { ports.forEach(function (p) { lmlEntries.push({ addr: cip, port: p, tls: true, ip: cip }); }); });
-			ips.forEach(function (hh) { ports.forEach(function (p) { lmlEntries.push({ addr: hh, port: p, tls: true, ip: '' }); }); });
-			lmlEntries.forEach((entry) => {
+			var tajEntries = [];
+			tlsIpsSt2.forEach(function (cip) { ports.forEach(function (p) { tajEntries.push({ addr: cip, port: p, tls: true, ip: cip }); }); });
+			ips.forEach(function (hh) { ports.forEach(function (p) { tajEntries.push({ addr: hh, port: p, tls: true, ip: '' }); }); });
+			tajEntries.forEach((entry) => {
 				resolvedProxies.forEach((proxy) => {
 						const ip = entry.addr;
 						const ipU = String(ip).indexOf(':') >= 0 ? '[' + ip + ']' : ip;
@@ -602,15 +602,15 @@
 						const tlsParams = isTlsPort ? ("&insecure=" + insecureFlag + "&fp=" + fp + "&allowInsecure=" + insecureFlag + "&sni=" + host) : "";
 
 						if (enableVless) {
-							const remark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							const remark = "TAJ | " + chainFlagSt + ipPartSt + u.username;
 							links.push('vle' + 'ss://' + (u.uuid || '') + '@' + ipU + ':' + portStr + '?path=' + proxy.currentDynPath + '&security=' + tlsVal + '&encryption=none&host=' + host + '&type=ws' + tlsParams + userFrag + '#' + encodeURIComponent(remark));
 						}
 						if (enableTrojan) {
-							const trojanRemark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							const trojanRemark = "TAJ | " + chainFlagSt + ipPartSt + u.username;
 							links.push('trojan://' + (u.uuid || '') + '@' + ipU + ':' + portStr + '?path=' + proxy.currentDynPath + '&security=' + tlsVal + '&host=' + host + '&type=ws' + tlsParams + userFrag + '#' + encodeURIComponent(trojanRemark));
 						}
 						if (enableSS) {
-							const ssRemark = "LML | " + chainFlagSt + ipPartSt + u.username;
+							const ssRemark = "TAJ | " + chainFlagSt + ipPartSt + u.username;
 							const methodPass = btoa("aes-256-gcm:" + (u.uuid || ''));
 							let pluginOpts = "v2ray-plugin;mode=websocket;host=" + host + ";path=" + decodeURIComponent(proxy.currentDynPath) + (isTlsPort ? ";tls" : "");
 							let pluginStr = encodeURIComponent(pluginOpts);
@@ -621,15 +621,15 @@
 			return links.join('\\n');
 		}
 		function copyvIeesConfig() {
-				lmlCopy(getvIeesLink() || '');
+				tajCopy(getvIeesLink() || '');
 		}
 		function copyTextSub() {
-			const link = window.location.protocol + '//' + lmlHostSafe() + '/sub/' + encodeURIComponent(window.statusUser.username);
-			lmlCopy(link);
+			const link = window.location.protocol + '//' + tajHostSafe() + '/sub/' + encodeURIComponent(window.statusUser.username);
+			tajCopy(link);
 		}
 		function copySingboxSub() {
-			const link = window.location.protocol + '//' + lmlHostSafe() + '/singbox/' + encodeURIComponent(window.statusUser.username);
-			lmlCopy(link);
+			const link = window.location.protocol + '//' + tajHostSafe() + '/singbox/' + encodeURIComponent(window.statusUser.username);
+			tajCopy(link);
 		}
 		function toggleQrModal(show, text) {
 			const modal = document.getElementById('qr-modal');
@@ -688,7 +688,7 @@
 			}
 			const downloadAnchor = document.createElement('a');
 			downloadAnchor.href = dataUrl;
-			downloadAnchor.download = "lml_qrcode_" + Date.now() + ".png";
+			downloadAnchor.download = "taj_qrcode_" + Date.now() + ".png";
 			document.body.appendChild(downloadAnchor);
 			downloadAnchor.click();
 			downloadAnchor.remove();
@@ -702,10 +702,10 @@
 			toggleQrModal(true, link);
 		}
 		function getFlagEmoji(countryCode) {
-			if (!countryCode) return '<span class="lml-flag-globe">🌐</span>';
+			if (!countryCode) return '<span class="taj-flag-globe">🌐</span>';
 			const cc = String(countryCode).toLowerCase().replace(/[^a-z]/g, '');
-			if (cc.length !== 2) return '<span class="lml-flag-globe">🌐</span>';
-			return '<span class="fi fi-' + cc + ' lml-flag" title="' + cc.toUpperCase() + '"></span>';
+			if (cc.length !== 2) return '<span class="taj-flag-globe">🌐</span>';
+			return '<span class="fi fi-' + cc + ' taj-flag" title="' + cc.toUpperCase() + '"></span>';
 		}
 		function getFlagEmojiText(countryCode) {
 			if (!countryCode) return '🌐';
@@ -776,9 +776,9 @@ const flagContainer = document.getElementById('display-flag');
 				} catch(e) {}
 				return flagSvg;
 			}
-			return '<span class="lml-flag-globe">🌐</span>';
+			return '<span class="taj-flag-globe">🌐</span>';
 		})
-		.catch(() => '<span class="lml-flag-globe">🌐</span>');
+		.catch(() => '<span class="taj-flag-globe">🌐</span>');
 	})).then(flags => {
 		flagContainer.innerHTML = flags.join(' ');
 	});
@@ -903,8 +903,8 @@ const flagContainer = document.getElementById('display-flag');
 		});
 		// TAJ 1-Click App Deep Links & Live Ping Test
 		try {
-			const lmlPageHost = window.LML_PANEL_HOST ? (location.protocol + '//' + window.LML_PANEL_HOST) : window.location.origin;
-			const currentSubUrl = lmlPageHost + '/sub/' + (typeof u !== 'undefined' && u.name ? u.name : window.location.pathname.split('/').pop());
+			const tajPageHost = window.TAJ_PANEL_HOST ? (location.protocol + '//' + window.TAJ_PANEL_HOST) : window.location.origin;
+			const currentSubUrl = tajPageHost + '/sub/' + (typeof u !== 'undefined' && u.name ? u.name : window.location.pathname.split('/').pop());
 			const v2Btn = document.getElementById('btn-v2rayng');
 			if (v2Btn) v2Btn.href = 'v2rayng://install-config?url=' + encodeURIComponent(currentSubUrl);
 			const hidBtn = document.getElementById('btn-hiddify');
@@ -963,7 +963,7 @@ const flagContainer = document.getElementById('display-flag');
 						setTimeout(probeNextC, 350);
 					}
 					try {
-						fetch('https://' + ipC + ':443/lml-crowd', { mode: 'no-cors', cache: 'no-store' }).then(finishC).catch(finishC);
+						fetch('https://' + ipC + ':443/taj-crowd', { mode: 'no-cors', cache: 'no-store' }).then(finishC).catch(finishC);
 					} catch (eC) { finishC(); }
 				}
 				function sendReportsC() {
@@ -986,8 +986,8 @@ const flagContainer = document.getElementById('display-flag');
 (function(){
 var button=document.createElement('button');button.textContent='تازه‌های نسخه';button.style.cssText='display:none;position:fixed;bottom:18px;left:18px;z-index:1000;background:#4f7cff;color:white;border:0;border-radius:12px;padding:12px 18px;font:inherit;cursor:pointer';document.body.appendChild(button);
 var box=document.createElement('dialog');box.dir='rtl';box.style.cssText='background:#0f1116;color:#e7e9ef;border:1px solid #343c4b;border-radius:18px;padding:24px;max-width:90vw;width:480px;line-height:2';document.body.appendChild(box);var release;
-button.onclick=function(){if(!release)return;box.replaceChildren();var title=document.createElement('h3');title.textContent='چه چیزهایی در نسخه '+release.version+' جدید است؟';box.appendChild(title);var ul=document.createElement('ul');release.notes.forEach(function(n){var li=document.createElement('li');li.textContent=n;ul.appendChild(li);});box.appendChild(ul);var close=document.createElement('button');close.textContent='متوجه شدم';close.style.cssText='background:#4f7cff;color:white;padding:8px 16px;border-radius:8px;border:0;cursor:pointer';close.onclick=function(){try{localStorage.setItem('lml.portal.release',release.build||release.version);}catch(e){}box.close();button.style.display='none';};box.appendChild(close);box.showModal();};
-async function check(){try{var r=await fetch('/lml-scanner/release',{cache:'no-store'});if(!r.ok)return;var j=await r.json();if(typeof j.version!=='string'||!Array.isArray(j.notes))return;release=j;var seen='';try{seen=localStorage.getItem('lml.portal.release')||'';}catch(e){}button.textContent='تازه‌های نسخه '+j.version;button.style.display=seen===(j.build||j.version)?'none':'block';}catch(e){}}
+button.onclick=function(){if(!release)return;box.replaceChildren();var title=document.createElement('h3');title.textContent='چه چیزهایی در نسخه '+release.version+' جدید است؟';box.appendChild(title);var ul=document.createElement('ul');release.notes.forEach(function(n){var li=document.createElement('li');li.textContent=n;ul.appendChild(li);});box.appendChild(ul);var close=document.createElement('button');close.textContent='متوجه شدم';close.style.cssText='background:#4f7cff;color:white;padding:8px 16px;border-radius:8px;border:0;cursor:pointer';close.onclick=function(){try{localStorage.setItem('taj.portal.release',release.build||release.version);}catch(e){}box.close();button.style.display='none';};box.appendChild(close);box.showModal();};
+async function check(){try{var r=await fetch('/taj-scanner/release',{cache:'no-store'});if(!r.ok)return;var j=await r.json();if(typeof j.version!=='string'||!Array.isArray(j.notes))return;release=j;var seen='';try{seen=localStorage.getItem('taj.portal.release')||'';}catch(e){}button.textContent='تازه‌های نسخه '+j.version;button.style.display=seen===(j.build||j.version)?'none':'block';}catch(e){}}
 check();setInterval(check,300000);document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
 })();
 </script>

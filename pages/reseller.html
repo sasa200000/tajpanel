@@ -453,7 +453,7 @@
 							🎲 نام تصادفی
 						</button>
 					</div>
-					<input type="text" id="cfg-username" required placeholder="lml_customer" dir="ltr" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 text-white text-xs font-mono outline-none transition">
+					<input type="text" id="cfg-username" required placeholder="taj_customer" dir="ltr" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 text-white text-xs font-mono outline-none transition">
 				</div>
 
 				<!-- Package Presets -->
@@ -669,8 +669,8 @@
 				
 				const limitGb = u.limit_gb ? parseFloat(u.limit_gb).toFixed(1) : 'نامحدود';
 				const usedGb = parseFloat(u.used_gb || 0).toFixed(2);
-				const subUrl = lmlPanelOrigin() + '/sub/' + encodeURIComponent(u.username);
-				const statusUrl = lmlPanelOrigin() + '/status/' + encodeURIComponent(u.username);
+				const subUrl = tajPanelOrigin() + '/sub/' + encodeURIComponent(u.username);
+				const statusUrl = tajPanelOrigin() + '/status/' + encodeURIComponent(u.username);
 				
 				const isActive = u.is_active === 1;
 				const statusBadge = isActive 
@@ -717,7 +717,7 @@
 
 		function generateResellerRandomUsername() {
 			const rnd = Math.random().toString(36).substring(2, 8);
-			document.getElementById('cfg-username').value = 'lml_' + rnd;
+			document.getElementById('cfg-username').value = 'taj_' + rnd;
 		}
 
 		function applyResellerPreset(gb, days, name) {
@@ -777,8 +777,8 @@
 		}
 
 		function showConfigResultModal(uname) {
-			const subUrl = lmlPanelOrigin() + '/sub/' + encodeURIComponent(uname);
-			const statusUrl = lmlPanelOrigin() + '/status/' + encodeURIComponent(uname);
+			const subUrl = tajPanelOrigin() + '/sub/' + encodeURIComponent(uname);
+			const statusUrl = tajPanelOrigin() + '/status/' + encodeURIComponent(uname);
 			
 			document.getElementById('result-sub-url-input').value = subUrl;
 			document.getElementById('btn-open-client-status').href = statusUrl;
@@ -807,12 +807,12 @@
 
 		function copyResultSubUrl() {
 			const url = document.getElementById('result-sub-url-input').value;
-			if (typeof lmlCopy === 'function') { lmlCopy(url); return; }
+			if (typeof tajCopy === 'function') { tajCopy(url); return; }
 			navigator.clipboard.writeText(url).then(function () { showToast('OK'); }).catch(function () { });
 		}
 
 		function copyClientSub(url) {
-			if (typeof lmlCopy === 'function') { lmlCopy(url); return; }
+			if (typeof tajCopy === 'function') { tajCopy(url); return; }
 			navigator.clipboard.writeText(url).then(function () { showToast('OK'); }).catch(function () { });
 		}
 

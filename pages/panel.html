@@ -4,8 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-	<script id="lml-copy-engine">
-		/* ============================================================\n		   TAJ COPY v1.0.6 — copy that never fails silently\n		   1) Clipboard API  2) execCommand + iOS trick  3) manual box\n		   ============================================================ */\n		function lmlMiniToast(msg, type) {\n			try {\n				var id = 'lml-mini-toast';\n				var old = document.getElementById(id);\n				if (old && old.parentNode) old.parentNode.removeChild(old);\n				var el = document.createElement('div');\n				el.id = id;\n				el.setAttribute('dir', 'rtl');\n				el.textContent = msg;\n				var bg = (type === 'err' || type === 'warn') ? '#7f1d1d' : '#065f46';\n				el.style.cssText = 'position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:2147483600;background:' + bg + ';color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.45);max-width:92vw;text-align:center;font-family:inherit;';\n				document.body.appendChild(el);\n				setTimeout(function () { try { el.parentNode.removeChild(el); } catch (e) { } }, 3200);\n			} catch (e) { }\n		}\n		function lmlToastSafe(msg, type) {\n			var t = (type === 'ok' || !type) ? 'ok' : 'err';\n			try { if (typeof window.lmlToastImpl === 'function') { window.lmlToastImpl(msg, t); return; } } catch (e) { }\n			try { if (typeof toast === 'function') { toast(msg, t); return; } } catch (e) { }\n			try { if (typeof showToast === 'function') { showToast(msg, t === 'ok' ? 'success' : 'error'); return; } } catch (e) { }\n			lmlMiniToast(msg, type);\n		}\n		function lmlExecCopy(text, okMsg) {\n			try {\n				var ta = document.createElement('textarea');\n				ta.value = text;\n				ta.setAttribute('readonly', '');\n				ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;outline:none;box-shadow:none;background:transparent;opacity:0;font-size:16px;';\n				document.body.appendChild(ta);\n				try { ta.focus(); ta.select(); if (ta.setSelectionRange) ta.setSelectionRange(0, ta.value.length); } catch (e) { }\n				var ok = false;\n				try { ok = (typeof document.execCommand === 'function') && document.execCommand('copy') === true; } catch (e) { ok = false; }\n				try { document.body.removeChild(ta); } catch (e) { }\n				if (ok) { if (okMsg) lmlToastSafe(okMsg, 'ok'); return true; }\n			} catch (e) { }\n			return false;\n		}\n		function lmlCopyBox(text) {\n			try {\n				var old = document.getElementById('lml-copy-box');\n				if (old && old.parentNode) old.parentNode.removeChild(old);\n				var wrap = document.createElement('div');\n				wrap.id = 'lml-copy-box';\n				wrap.setAttribute('dir', 'rtl');\n				wrap.style.cssText = 'position:fixed;left:0;right:0;top:0;bottom:0;z-index:2147483000;background:rgba(3,7,18,.85);display:flex;align-items:flex-end;justify-content:center;';\n				var card = document.createElement('div');\n				card.style.cssText = 'width:100%;max-width:560px;background:#0d1526;color:#e5e7eb;border-radius:16px 16px 0 0;padding:14px 14px 22px;box-sizing:border-box;';\n				var h = document.createElement('div');\n				h.style.cssText = 'font-weight:800;font-size:14px;margin-bottom:8px;';\n				h.textContent = '\\u0645\\u062a\\u0646 \\u0622\\u0645\\u0627\\u062f\\u0647 \\u0627\\u0633\\u062a \\u2014 \\u062f\\u06a9\\u0645\\u0647\\u0654 \\u06a9\\u067e\\u06cc \\u0631\\u0627 \\u0628\\u0632\\u0646\\u06cc\\u062f';\n				var ta = document.createElement('textarea');\n				ta.value = text;\n				ta.setAttribute('dir', 'ltr');\n				ta.style.cssText = 'width:100%;height:150px;box-sizing:border-box;background:#0a1220;color:#93c5fd;border:1px solid rgba(148,163,255,.25);border-radius:10px;padding:10px;font-size:13px;font-family:ui-monospace,Menlo,monospace;line-height:1.6;';\n				var row = document.createElement('div');\n				row.style.cssText = 'display:flex;gap:8px;margin-top:10px;';\n				var bAll = document.createElement('button');\n				bAll.type = 'button'; bAll.textContent = '\\u0627\\u0646\\u062a\\u062e\\u0627\\u0628 \\u0647\\u0645\\u0647';\n				bAll.style.cssText = 'flex:1;min-height:44px;border-radius:10px;border:0;background:#2563eb;color:#fff;font-weight:700;font-size:13px;';\n				bAll.onclick = function () { try { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); } catch (e) { } };\n				var bTry = document.createElement('button');\n				bTry.type = 'button'; bTry.textContent = '\\u062a\\u0644\\u0627\\u0634 \\u062f\\u0648\\u0628\\u0627\\u0631\\u0647';\n				bTry.style.cssText = 'flex:1;min-height:44px;border-radius:10px;border:1px solid rgba(148,163,255,.35);background:transparent;color:#e5e7eb;font-weight:700;font-size:13px;';\n				bTry.onclick = function () { lmlCopy(text); };\n				var bClose = document.createElement('button');\n				bClose.type = 'button'; bClose.textContent = '\\u0628\\u0633\\u062a\\u0646';\n				bClose.style.cssText = 'flex:0 0 auto;padding:0 14px;min-height:44px;border-radius:10px;border:1px solid rgba(148,163,255,.35);background:transparent;color:#e5e7eb;font-weight:700;font-size:13px;';\n				bClose.onclick = function () { try { wrap.parentNode.removeChild(wrap); } catch (e) { } };\n				row.appendChild(bAll); row.appendChild(bTry); row.appendChild(bClose);\n				card.appendChild(h); card.appendChild(ta); card.appendChild(row);\n				wrap.appendChild(card);\n				document.body.appendChild(wrap);\n				try { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); } catch (e) { }\n			} catch (e) { }\n		}\n		function lmlCopy(text, msg, silent) {\n			try {\n				text = (text === null || text === undefined) ? '' : String(text);\n				if (!text.replace(/\\s/g, '')) {\n					if (!silent) lmlToastSafe('\\u26a0\\ufe0f \\u0686\\u06cc\\u0632\\u06cc \\u0628\\u0631\\u0627\\u06cc \\u06a9\\u067e\\u06cc \\u067e\\u06cc\\u062f\\u0627 \\u0646\\u0634\\u062f\\u061b \\u0635\\u0641\\u062d\\u0647 \\u0631\\u0627 \\u0631\\u0641\\u0631\\u0634 \\u06a9\\u0646\\u06cc\\u062f.', 'warn');\n					return false;\n				}\n				var okMsg = msg || '\\u2705 \\u06a9\\u067e\\u06cc \\u0634\\u062f!';\n				if (navigator.clipboard && navigator.clipboard.writeText) {\n					navigator.clipboard.writeText(text).then(function () {\n						if (!silent) lmlToastSafe(okMsg, 'ok');\n					}).catch(function () {\n						if (!lmlExecCopy(text, okMsg)) lmlCopyBox(text);\n					});\n					return true;\n				}\n				if (lmlExecCopy(text, okMsg)) return true;\n				if (lmlExecCopy(text, okMsg)) return true;\n				if (!silent) lmlCopyBox(text);\n				return false;\n			} catch (e) {\n				if (!silent) { try { lmlCopyBox(text); } catch (e2) { } }\n				return false;\n			}\n		}\n		window.lmlCopy = lmlCopy;\n		window.lmlCopyBox = lmlCopyBox;\n		window.lmlToastSafe = lmlToastSafe;\n
+	<script id="taj-copy-engine">
+		/* ============================================================\n		   TAJ COPY v1.0.6 — copy that never fails silently\n		   1) Clipboard API  2) execCommand + iOS trick  3) manual box\n		   ============================================================ */\n		function tajMiniToast(msg, type) {\n			try {\n				var id = 'taj-mini-toast';\n				var old = document.getElementById(id);\n				if (old && old.parentNode) old.parentNode.removeChild(old);\n				var el = document.createElement('div');\n				el.id = id;\n				el.setAttribute('dir', 'rtl');\n				el.textContent = msg;\n				var bg = (type === 'err' || type === 'warn') ? '#7f1d1d' : '#065f46';\n				el.style.cssText = 'position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:2147483600;background:' + bg + ';color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.45);max-width:92vw;text-align:center;font-family:inherit;';\n				document.body.appendChild(el);\n				setTimeout(function () { try { el.parentNode.removeChild(el); } catch (e) { } }, 3200);\n			} catch (e) { }\n		}\n		function tajToastSafe(msg, type) {\n			var t = (type === 'ok' || !type) ? 'ok' : 'err';\n			try { if (typeof window.tajToastImpl === 'function') { window.tajToastImpl(msg, t); return; } } catch (e) { }\n			try { if (typeof toast === 'function') { toast(msg, t); return; } } catch (e) { }\n			try { if (typeof showToast === 'function') { showToast(msg, t === 'ok' ? 'success' : 'error'); return; } } catch (e) { }\n			tajMiniToast(msg, type);\n		}\n		function tajExecCopy(text, okMsg) {\n			try {\n				var ta = document.createElement('textarea');\n				ta.value = text;\n				ta.setAttribute('readonly', '');\n				ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;outline:none;box-shadow:none;background:transparent;opacity:0;font-size:16px;';\n				document.body.appendChild(ta);\n				try { ta.focus(); ta.select(); if (ta.setSelectionRange) ta.setSelectionRange(0, ta.value.length); } catch (e) { }\n				var ok = false;\n				try { ok = (typeof document.execCommand === 'function') && document.execCommand('copy') === true; } catch (e) { ok = false; }\n				try { document.body.removeChild(ta); } catch (e) { }\n				if (ok) { if (okMsg) tajToastSafe(okMsg, 'ok'); return true; }\n			} catch (e) { }\n			return false;\n		}\n		function tajCopyBox(text) {\n			try {\n				var old = document.getElementById('taj-copy-box');\n				if (old && old.parentNode) old.parentNode.removeChild(old);\n				var wrap = document.createElement('div');\n				wrap.id = 'taj-copy-box';\n				wrap.setAttribute('dir', 'rtl');\n				wrap.style.cssText = 'position:fixed;left:0;right:0;top:0;bottom:0;z-index:2147483000;background:rgba(3,7,18,.85);display:flex;align-items:flex-end;justify-content:center;';\n				var card = document.createElement('div');\n				card.style.cssText = 'width:100%;max-width:560px;background:#0d1526;color:#e5e7eb;border-radius:16px 16px 0 0;padding:14px 14px 22px;box-sizing:border-box;';\n				var h = document.createElement('div');\n				h.style.cssText = 'font-weight:800;font-size:14px;margin-bottom:8px;';\n				h.textContent = '\\u0645\\u062a\\u0646 \\u0622\\u0645\\u0627\\u062f\\u0647 \\u0627\\u0633\\u062a \\u2014 \\u062f\\u06a9\\u0645\\u0647\\u0654 \\u06a9\\u067e\\u06cc \\u0631\\u0627 \\u0628\\u0632\\u0646\\u06cc\\u062f';\n				var ta = document.createElement('textarea');\n				ta.value = text;\n				ta.setAttribute('dir', 'ltr');\n				ta.style.cssText = 'width:100%;height:150px;box-sizing:border-box;background:#0a1220;color:#93c5fd;border:1px solid rgba(148,163,255,.25);border-radius:10px;padding:10px;font-size:13px;font-family:ui-monospace,Menlo,monospace;line-height:1.6;';\n				var row = document.createElement('div');\n				row.style.cssText = 'display:flex;gap:8px;margin-top:10px;';\n				var bAll = document.createElement('button');\n				bAll.type = 'button'; bAll.textContent = '\\u0627\\u0646\\u062a\\u062e\\u0627\\u0628 \\u0647\\u0645\\u0647';\n				bAll.style.cssText = 'flex:1;min-height:44px;border-radius:10px;border:0;background:#2563eb;color:#fff;font-weight:700;font-size:13px;';\n				bAll.onclick = function () { try { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); } catch (e) { } };\n				var bTry = document.createElement('button');\n				bTry.type = 'button'; bTry.textContent = '\\u062a\\u0644\\u0627\\u0634 \\u062f\\u0648\\u0628\\u0627\\u0631\\u0647';\n				bTry.style.cssText = 'flex:1;min-height:44px;border-radius:10px;border:1px solid rgba(148,163,255,.35);background:transparent;color:#e5e7eb;font-weight:700;font-size:13px;';\n				bTry.onclick = function () { tajCopy(text); };\n				var bClose = document.createElement('button');\n				bClose.type = 'button'; bClose.textContent = '\\u0628\\u0633\\u062a\\u0646';\n				bClose.style.cssText = 'flex:0 0 auto;padding:0 14px;min-height:44px;border-radius:10px;border:1px solid rgba(148,163,255,.35);background:transparent;color:#e5e7eb;font-weight:700;font-size:13px;';\n				bClose.onclick = function () { try { wrap.parentNode.removeChild(wrap); } catch (e) { } };\n				row.appendChild(bAll); row.appendChild(bTry); row.appendChild(bClose);\n				card.appendChild(h); card.appendChild(ta); card.appendChild(row);\n				wrap.appendChild(card);\n				document.body.appendChild(wrap);\n				try { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); } catch (e) { }\n			} catch (e) { }\n		}\n		function tajCopy(text, msg, silent) {\n			try {\n				text = (text === null || text === undefined) ? '' : String(text);\n				if (!text.replace(/\\s/g, '')) {\n					if (!silent) tajToastSafe('\\u26a0\\ufe0f \\u0686\\u06cc\\u0632\\u06cc \\u0628\\u0631\\u0627\\u06cc \\u06a9\\u067e\\u06cc \\u067e\\u06cc\\u062f\\u0627 \\u0646\\u0634\\u062f\\u061b \\u0635\\u0641\\u062d\\u0647 \\u0631\\u0627 \\u0631\\u0641\\u0631\\u0634 \\u06a9\\u0646\\u06cc\\u062f.', 'warn');\n					return false;\n				}\n				var okMsg = msg || '\\u2705 \\u06a9\\u067e\\u06cc \\u0634\\u062f!';\n				if (navigator.clipboard && navigator.clipboard.writeText) {\n					navigator.clipboard.writeText(text).then(function () {\n						if (!silent) tajToastSafe(okMsg, 'ok');\n					}).catch(function () {\n						if (!tajExecCopy(text, okMsg)) tajCopyBox(text);\n					});\n					return true;\n				}\n				if (tajExecCopy(text, okMsg)) return true;\n				if (tajExecCopy(text, okMsg)) return true;\n				if (!silent) tajCopyBox(text);\n				return false;\n			} catch (e) {\n				if (!silent) { try { tajCopyBox(text); } catch (e2) { } }\n				return false;\n			}\n		}\n		window.tajCopy = tajCopy;\n		window.tajCopyBox = tajCopyBox;\n		window.tajToastSafe = tajToastSafe;\n
 	</script>
 	<meta name="robots" content="noindex, nofollow">
 	<title>TAJPANEL — داشبورد مدیریت</title>
@@ -25,15 +25,15 @@
 			try {
 				var gfxOn = (window.GLOBAL_GFX === 'true') || (!window.GLOBAL_GFX.startsWith('/*') && window.GLOBAL_GFX === 'true') || localStorage.getItem('gfx-enabled') === 'true';
 				if (!gfxOn) document.documentElement.classList.add('gfx-off');
-				var stored = localStorage.getItem('lml-theme');
-				var theme = stored || (localStorage.getItem('color-theme') === 'light' ? 'light' : 'dark');
+				var stored = localStorage.getItem('taj-theme');
+				var theme = stored || 'blue';
 				document.documentElement.setAttribute('data-theme', theme);
 				if (theme !== 'dark') document.documentElement.classList.remove('dark');
 				else document.documentElement.classList.add('dark');
 				if (localStorage.getItem('grayscale-theme') === 'true') document.documentElement.classList.add('grayscale-active');
-				var density = localStorage.getItem('lml-density');
+				var density = localStorage.getItem('taj-density');
 				document.documentElement.setAttribute('data-density', density || 'comfortable');
-				var sbPref = localStorage.getItem('lml-sidebar-pref') || localStorage.getItem('lml-sidebar');
+				var sbPref = localStorage.getItem('taj-sidebar-pref') || localStorage.getItem('taj-sidebar');
 				document.documentElement.setAttribute('data-sidebar', (sbPref === 'mini') ? 'mini' : 'expanded');
 			} catch (e) {}
 		})();
@@ -84,102 +84,31 @@
 	html[data-density="compact"] .card { padding: 12px; }
 	html[data-density="compact"] .tbl th, html[data-density="compact"] .tbl td { padding: 7px 10px; }
 
-	html[data-theme="dark"] {
-		--bg: #08090c;
-		--bg-soft: #0b0d12;
-		--surface: #0f1116;
-		--surface-2: #14171e;
-		--surface-3: #1a1e27;
-		--border: rgba(255,255,255,.075);
-		--border-strong: rgba(255,255,255,.14);
-		--text: #e7e9ef;
-		--text-2: #b3bacb;
-		--text-3: #7b839a;
-		--text-4: #565d70;
-		--accent: #4f7cff;
-		--accent-soft: rgba(79,124,255,.14);
-		--accent-text: #8fa8ff;
-		--ok: #34d399;
-		--ok-soft: rgba(52,211,153,.13);
-		--warn: #fbbf24;
-		--warn-soft: rgba(251,191,36,.13);
-		--err: #f87171;
-		--err-soft: rgba(248,113,113,.13);
-		--info: #38bdf8;
-		--info-soft: rgba(56,189,248,.13);
-		--violet: #a78bfa;
-		--violet-soft: rgba(167,139,250,.13);
-		--shadow-1: 0 1px 2px rgba(0,0,0,.4);
-		--shadow-2: 0 4px 16px rgba(0,0,0,.35);
-		--shadow-3: 0 18px 50px rgba(0,0,0,.55);
-		--glass: rgba(15,17,22,.72);
-		--grid-line: rgba(255,255,255,.06);
-		color-scheme: dark;
-	}
-
-	html[data-theme="light"] {
-		--bg: #f4f5f8;
-		--bg-soft: #eceef2;
-		--surface: #ffffff;
-		--surface-2: #f7f8fa;
-		--surface-3: #eff1f5;
-		--border: rgba(15,17,22,.09);
-		--border-strong: rgba(15,17,22,.17);
-		--text: #12151c;
-		--text-2: #414a5c;
-		--text-3: #6b7488;
-		--text-4: #98a0b3;
-		--accent: #3457e0;
-		--accent-soft: rgba(52,87,224,.10);
-		--accent-text: #2f4ed0;
-		--ok: #059669;
-		--ok-soft: rgba(5,150,105,.11);
-		--warn: #b45309;
-		--warn-soft: rgba(180,83,9,.11);
-		--err: #dc2626;
-		--err-soft: rgba(220,38,38,.10);
-		--info: #0369a1;
-		--info-soft: rgba(3,105,161,.10);
-		--violet: #7c3aed;
-		--violet-soft: rgba(124,58,237,.10);
-		--shadow-1: 0 1px 2px rgba(16,24,40,.06);
-		--shadow-2: 0 4px 14px rgba(16,24,40,.08);
-		--shadow-3: 0 18px 44px rgba(16,24,40,.16);
-		--glass: rgba(255,255,255,.78);
-		--grid-line: rgba(15,17,22,.07);
-		color-scheme: light;
-	}
-
-	html.grayscale-active { filter: grayscale(100%); }
-
-	/* بخش پروکسی خروجی کاملاً برداشته شد — المان‌ها در DOM می‌مانند تا ذخیره/لود کاربرها هرگز نشکند */
-	#vtab-proxy { display: none !important; }
-
-	/* بخش کاربر و پروکسی خروجی: فقط فرم خالی و تمیز — متن‌های توضیحی اضافه حذف */
-	#modalUser .sr-d, #modalUser .hint, #modalUser .note { display: none !important; }
-	#modalUser .acc-body .field > label + .hint { display: none !important; }
-
-	/* ---- پنج تم جدید LML (همه بر پایهٔ طرح تیره — خوانایی کامل) ---- */
+	/* ============================================================
+	   TAJPANEL — 8 COLOR THEMES
+	   ============================================================ */
 	html[data-theme="pink"] {
-		--bg:#140a11; --bg-soft:#1b0d16; --surface:#22101b; --surface-2:#2c1422; --surface-3:#391a2b;
+		--bg:#150a12; --bg-soft:#1c0d17; --surface:#23101c; --surface-2:#2e1424; --surface-3:#3b1a2e;
 		--border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.16);
-		--text:#ffe9f3; --text-2:#f3b9d4; --text-3:#c98dae; --text-4:#8f5e7d;
-		--accent:#ff2d97; --accent-soft:rgba(255,45,151,.16); --accent-text:#ff8cc4;
+		--text:#ffeaf4; --text-2:#f4bcd8; --text-3:#cb8fb0; --text-4:#8f5e7d;
+		--accent:#ff2d97; --accent-soft:rgba(255,45,151,.16); --accent-text:#ff8cc6;
 		--ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13);
 		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
 		--violet:#c084fc; --violet-soft:rgba(192,132,252,.13);
 		--shadow-1:0 1px 2px rgba(0,0,0,.45); --shadow-2:0 4px 16px rgba(0,0,0,.45); --shadow-3:0 18px 50px rgba(0,0,0,.65);
+		--glass:rgba(30,12,24,.72); --grid-line:rgba(255,255,255,.06);
 		color-scheme:dark;
 	}
 	html[data-theme="yellow"] {
-		--bg:#141003; --bg-soft:#1b1504; --surface:#221c06; --surface-2:#2c2407; --surface-3:#392f09;
+		--bg:#151103; --bg-soft:#1c1604; --surface:#231d06; --surface-2:#2e2607; --surface-3:#3b3109;
 		--border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
-		--text:#fff9d6; --text-2:#f2d97a; --text-3:#c2a93f; --text-4:#8a7625;
+		--text:#fff9d6; --text-2:#f2d97a; --text-3:#c4ab3f; --text-4:#8a7625;
 		--accent:#f7ff00; --accent-soft:rgba(247,255,0,.15); --accent-text:#fff066;
 		--ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fde047; --warn-soft:rgba(253,224,71,.14);
 		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
 		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
 		--shadow-1:0 1px 2px rgba(0,0,0,.45); --shadow-2:0 4px 16px rgba(0,0,0,.45); --shadow-3:0 18px 50px rgba(0,0,0,.65);
+		--glass:rgba(32,26,6,.72); --grid-line:rgba(255,255,255,.06);
 		color-scheme:dark;
 	}
 	html[data-theme="phosphor"] {
@@ -191,6 +120,7 @@
 		--err:#ff5c5c; --err-soft:rgba(255,92,92,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
 		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
 		--shadow-1:0 1px 2px rgba(0,0,0,.5); --shadow-2:0 4px 16px rgba(0,0,0,.5); --shadow-3:0 18px 50px rgba(0,0,0,.7);
+		--glass:rgba(5,26,9,.72); --grid-line:rgba(0,255,65,.07);
 		color-scheme:dark;
 	}
 	html[data-theme="black"] {
@@ -202,6 +132,7 @@
 		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
 		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
 		--shadow-1:0 1px 2px rgba(0,0,0,.6); --shadow-2:0 4px 16px rgba(0,0,0,.6); --shadow-3:0 18px 50px rgba(0,0,0,.8);
+		--glass:rgba(10,10,10,.75); --grid-line:rgba(255,255,255,.07);
 		color-scheme:dark;
 	}
 	html[data-theme="beige"] {
@@ -213,6 +144,7 @@
 		--err:#dc2626; --err-soft:rgba(220,38,38,.10); --info:#0369a1; --info-soft:rgba(3,105,161,.10);
 		--violet:#7c3aed; --violet-soft:rgba(124,58,237,.10);
 		--shadow-1:0 1px 2px rgba(60,45,25,.08); --shadow-2:0 4px 16px rgba(60,45,25,.10); --shadow-3:0 18px 50px rgba(60,45,25,.18);
+		--glass:rgba(250,246,238,.78); --grid-line:rgba(60,45,25,.08);
 		color-scheme:light;
 	}
 	html[data-theme="blue"] {
@@ -224,41 +156,55 @@
 		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
 		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
 		--shadow-1:0 1px 2px rgba(0,0,0,.45); --shadow-2:0 4px 16px rgba(0,0,0,.45); --shadow-3:0 18px 50px rgba(0,0,0,.65);
+		--glass:rgba(10,26,46,.72); --grid-line:rgba(147,197,253,.07);
 		color-scheme:dark;
 	}
-	html[data-theme="midnight"] { --bg:#050a18; --bg-soft:#081020; --surface:#0b1428; --surface-2:#101b33; --surface-3:#16233f; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.15); --text:#e8ecf7; --text-2:#b7c0d8; --text-3:#7d88a6; --text-4:#59627d; --accent:#3b82f6; --accent-soft:rgba(59,130,246,.15); --accent-text:#93b4ff; --ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13); --err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13); --violet:#a78bfa; --violet-soft:rgba(167,139,250,.13); --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 4px 16px rgba(0,0,0,.4); --shadow-3:0 18px 50px rgba(0,0,0,.6); --glass:rgba(11,20,40,.72); --grid-line:rgba(255,255,255,.06); color-scheme:dark; }
-	html[data-theme="royal"] { --bg:#0a0614; --bg-soft:#100a1e; --surface:#150e28; --surface-2:#1c1334; --surface-3:#241a42; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.15); --text:#ece8f7; --text-2:#c0b7d8; --text-3:#8b7da6; --text-4:#63597d; --accent:#a855f7; --accent-soft:rgba(168,85,247,.15); --accent-text:#d0a7ff; --ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13); --err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13); --violet:#c4b5fd; --violet-soft:rgba(196,181,253,.13); --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 4px 16px rgba(0,0,0,.4); --shadow-3:0 18px 50px rgba(0,0,0,.6); --glass:rgba(21,14,40,.72); --grid-line:rgba(255,255,255,.06); color-scheme:dark; }
-	html[data-theme="forest"] { --bg:#050f0a; --bg-soft:#08150e; --surface:#0b1c12; --surface-2:#10251a; --surface-3:#163022; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.15); --text:#e8f7ee; --text-2:#b7d8c4; --text-3:#7da68d; --text-4:#597d66; --accent:#22c55e; --accent-soft:rgba(34,197,94,.15); --accent-text:#97f7b4; --ok:#4ade80; --ok-soft:rgba(74,222,128,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13); --err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13); --violet:#a78bfa; --violet-soft:rgba(167,139,250,.13); --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 4px 16px rgba(0,0,0,.4); --shadow-3:0 18px 50px rgba(0,0,0,.6); --glass:rgba(11,28,18,.72); --grid-line:rgba(255,255,255,.06); color-scheme:dark; }
-	html[data-theme="crimson"] { --bg:#120608; --bg-soft:#180a0d; --surface:#1e0d11; --surface-2:#281217; --surface-3:#33181e; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.15); --text:#f7e8ea; --text-2:#d8b7bd; --text-3:#a67d85; --text-4:#7d5960; --accent:#ef4444; --accent-soft:rgba(239,68,68,.15); --accent-text:#ffa7a7; --ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13); --err:#fca5a5; --err-soft:rgba(252,165,165,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13); --violet:#a78bfa; --violet-soft:rgba(167,139,250,.13); --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 4px 16px rgba(0,0,0,.4); --shadow-3:0 18px 50px rgba(0,0,0,.6); --glass:rgba(30,13,17,.72); --grid-line:rgba(255,255,255,.06); color-scheme:dark; }
-	html[data-theme="ocean"] { --bg:#041014; --bg-soft:#06151b; --surface:#081c23; --surface-2:#0c252e; --surface-3:#11303b; --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.15); --text:#e8f5f7; --text-2:#b7d3d8; --text-3:#7d9ea6; --text-4:#59767d; --accent:#06b6d4; --accent-soft:rgba(6,182,212,.15); --accent-text:#97e7f7; --ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13); --err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13); --violet:#a78bfa; --violet-soft:rgba(167,139,250,.13); --shadow-1:0 1px 2px rgba(0,0,0,.4); --shadow-2:0 4px 16px rgba(0,0,0,.4); --shadow-3:0 18px 50px rgba(0,0,0,.6); --glass:rgba(8,28,35,.72); --grid-line:rgba(255,255,255,.06); color-scheme:dark; }
-
-	/* کل تنظیمات: یک اندازهٔ کوچک و یکدست مثل بقیهٔ پنل — هیچ بزرگ/کوچکی نداریم */
-	#view-settings * { font-size: var(--fs-sm) !important; }
-	#view-settings .page-title { font-size: var(--fs-lg) !important; font-weight: 800 !important; }
-	#view-settings .ah-text { display: flex !important; flex-direction: column !important; gap: 4px !important; align-items: flex-start !important; }
-	#view-settings .ah-t, #view-settings .ah-d { display: block !important; }
-	#view-settings .ah-t { font-weight: 500 !important; }
-	#view-settings .ah-d { color: var(--text-3) !important; font-weight: 400 !important; }
-	#view-settings .acc-head, #view-settings .acc-head * { font-size: var(--fs-sm) !important; }
-	#view-settings .kv .k { color: var(--text-3) !important; }
-	#view-settings .hint { font-size: var(--fs-xs) !important; line-height: 1.9 !important; }
-	#view-settings label { font-size: var(--fs-sm) !important; }
-	#view-settings .kv .k, #view-settings .kv .v { font-size: var(--fs-sm) !important; }
-	#view-settings .sr-t { font-size: var(--fs-sm) !important; }
-	#view-settings .sr-d { font-size: var(--fs-xs) !important; }
-	#view-settings .input, #view-settings .select, #view-settings .btn { font-size: var(--fs-sm) !important; }
-
-	body {
-		margin: 0;
-		font-family: var(--font-sans);
-		font-size: var(--fs-md);
-		line-height: 1.65;
-		color: var(--text);
-		background: var(--bg);
-		-webkit-font-smoothing: antialiased;
-		text-rendering: optimizeLegibility;
-		overflow: hidden;
+	html[data-theme="navy"] {
+		--bg:#020816; --bg-soft:#030d1f; --surface:#061230; --surface-2:#0a1a3d; --surface-3:#0e2250;
+		--border:rgba(96,130,220,.14); --border-strong:rgba(96,130,220,.3);
+		--text:#e8eefc; --text-2:#a8b9e8; --text-3:#6f80b8; --text-4:#48578a;
+		--accent:#3b6ef7; --accent-soft:rgba(59,110,247,.16); --accent-text:#8fb2ff;
+		--ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13);
+		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
+		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
+		--shadow-1:0 1px 2px rgba(0,0,0,.5); --shadow-2:0 4px 16px rgba(0,0,0,.5); --shadow-3:0 18px 50px rgba(0,0,0,.7);
+		--glass:rgba(6,18,48,.74); --grid-line:rgba(96,130,220,.08);
+		color-scheme:dark;
 	}
+	html[data-theme="orange"] {
+		--bg:#160b02; --bg-soft:#1d1003; --surface:#241504; --surface-2:#301c05; --surface-3:#3d2507;
+		--border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
+		--text:#fff0dc; --text-2:#ffc987; --text-3:#d19143; --text-4:#8f6320;
+		--accent:#ff7a00; --accent-soft:rgba(255,122,0,.16); --accent-text:#ffa54d;
+		--ok:#34d399; --ok-soft:rgba(52,211,153,.13); --warn:#fbbf24; --warn-soft:rgba(251,191,36,.13);
+		--err:#f87171; --err-soft:rgba(248,113,113,.13); --info:#38bdf8; --info-soft:rgba(56,189,248,.13);
+		--violet:#a78bfa; --violet-soft:rgba(167,139,250,.13);
+		--shadow-1:0 1px 2px rgba(0,0,0,.45); --shadow-2:0 4px 16px rgba(0,0,0,.45); --shadow-3:0 18px 50px rgba(0,0,0,.65);
+		--glass:rgba(36,21,4,.72); --grid-line:rgba(255,255,255,.06);
+		color-scheme:dark;
+	}
+
+
+
+
+
+	html.grayscale-active { filter: grayscale(100%); }
+
+	/* بخش پروکسی خروجی کاملاً برداشته شد — المان‌ها در DOM می‌مانند تا ذخیره/لود کاربرها هرگز نشکند */
+	#vtab-proxy { display: none !important; }
+
+	/* بخش کاربر و پروکسی خروجی: فقط فرم خالی و تمیز — متن‌های توضیحی اضافه حذف */
+	#modalUser .sr-d, #modalUser .hint, #modalUser .note { display: none !important; }
+	#modalUser .acc-body .field > label + .hint { display: none !important; }
+
+	/* ---- پنج تم جدید TAJ (همه بر پایهٔ طرح تیره — خوانایی کامل) ---- */
+
+
+
+
+
+
+
 
 	/* Subtle ambient depth (disabled in gfx-off mode) */
 	body::before {
@@ -998,23 +944,23 @@
 	.beta-banner .bb-x { margin-inline-start:auto; flex:0 0 auto; }
 	.scan-log { margin-top:10px; padding:10px 12px; border-radius:var(--r-md); background:var(--surface-2);
 		border:1px solid var(--border); font-size:var(--fs-xs); line-height:2; color:var(--text-3); white-space:pre-line; }
-	.sb-logo-lml { background: transparent; box-shadow: none; }
-	.sb-logo-lml svg { width: 22px; height: 19px; display: block; }
-	html[data-sidebar="mini"] .sb-logo-lml svg { width: 22px; height: 19px; }
-	.lml-hero { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 0 16px;
+	.sb-logo-taj { background: transparent; box-shadow: none; }
+	.sb-logo-taj svg { width: 22px; height: 19px; display: block; }
+	html[data-sidebar="mini"] .sb-logo-taj svg { width: 22px; height: 19px; }
+	.taj-hero { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 0 16px;
 		padding: 14px 16px; border-radius: var(--r-xl); background: var(--surface); border: 1px solid var(--border); }
-	.lml-hero-mark { flex: 0 0 auto; }
-	.lml-hero-mark svg { width: 36px; height: 31px; display: block; }
-	.lml-hero-txt { min-width: 0; }
-	.lml-hero-name { font-weight: 900; font-size: var(--fs-xl); letter-spacing: .4px; display: flex; align-items: center; gap: 8px; line-height: 1.2; }
-	.lml-hero-sub { font-size: var(--fs-xs); color: var(--text-3); margin-top: 3px; }
-	.lml-ver { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; color: var(--accent); background: var(--accent-soft); }
-	.lml-hero-free { margin-inline-start: auto; display: flex; align-items: center; gap: 9px; padding: 8px 15px;
+	.taj-hero-mark { flex: 0 0 auto; }
+	.taj-hero-mark svg { width: 36px; height: 31px; display: block; }
+	.taj-hero-txt { min-width: 0; }
+	.taj-hero-name { font-weight: 900; font-size: var(--fs-xl); letter-spacing: .4px; display: flex; align-items: center; gap: 8px; line-height: 1.2; }
+	.taj-hero-sub { font-size: var(--fs-xs); color: var(--text-3); margin-top: 3px; }
+	.taj-ver { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 999px; color: var(--accent); background: var(--accent-soft); }
+	.taj-hero-free { margin-inline-start: auto; display: flex; align-items: center; gap: 9px; padding: 8px 15px;
 		border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-size: var(--fs-xs); }
-	.lml-hero-free > svg { width: 13px; height: 13px; flex: 0 0 auto; }
-	.lml-hero-free b { display: block; font-weight: 900; }
-	.lml-hero-free span { display: block; font-size: 10px; color: var(--text-3); font-weight: 500; }
-	@media (max-width: 700px) { .lml-hero-free { margin-inline-start: 0; width: 100%; } }
+	.taj-hero-free > svg { width: 13px; height: 13px; flex: 0 0 auto; }
+	.taj-hero-free b { display: block; font-weight: 900; }
+	.taj-hero-free span { display: block; font-size: 10px; color: var(--text-3); font-weight: 500; }
+	@media (max-width: 700px) { .taj-hero-free { margin-inline-start: 0; width: 100%; } }
 
 	/* ============================================================
 	   بهينه‌سازي موبايل / اندرويد
@@ -1108,9 +1054,9 @@
 	
 /* Mobile release: drawer rather than a permanent desktop rail. */
 @media(max-width:900px){
- .app{width:100%;height:var(--lml-vh,100dvh)}
+ .app{width:100%;height:var(--taj-vh,100dvh)}
  .main{width:100%;min-width:0}
- html[data-sidebar] .sidebar{position:fixed;top:0;right:0;bottom:0;left:auto;width:min(310px,86vw);height:var(--lml-vh,100dvh);flex-basis:auto;transform:translateX(105%);visibility:hidden;overflow:hidden;transition:transform .2s,visibility .2s;z-index:260;border-inline-end:1px solid var(--border)}
+ html[data-sidebar] .sidebar{position:fixed;top:0;right:0;bottom:0;left:auto;width:min(310px,86vw);height:var(--taj-vh,100dvh);flex-basis:auto;transform:translateX(105%);visibility:hidden;overflow:hidden;transition:transform .2s,visibility .2s;z-index:260;border-inline-end:1px solid var(--border)}
  html[data-sidebar] body.sb-drawer .sidebar{transform:none;visibility:visible}
  .sb-overlay{z-index:250}
  body.sb-drawer .content{overflow:hidden}
@@ -1127,13 +1073,13 @@
  .topbar .tb-btn{flex-shrink:0}
  .content{min-width:0;overflow-x:hidden}
  .card,.view,.form-row>*,.form-row-3>*{min-width:0;max-width:100%}
- .modal{height:var(--lml-vh,100dvh);bottom:auto;padding:8px;align-items:center}
- .modal .modal-card,.modal.xwide .modal-card{margin:0;max-height:calc(var(--lml-vh,100dvh) - 16px);max-width:100%}
+ .modal{height:var(--taj-vh,100dvh);bottom:auto;padding:8px;align-items:center}
+ .modal .modal-card,.modal.xwide .modal-card{margin:0;max-height:calc(var(--taj-vh,100dvh) - 16px);max-width:100%}
  .modal-body{min-height:0;overflow-y:auto;overscroll-behavior:contain}
  .modal-head,.modal-foot{flex-shrink:0}
- .drawer{max-width:100vw;max-height:var(--lml-vh,100dvh)}
+ .drawer{max-width:100vw;max-height:var(--taj-vh,100dvh)}
  .vtabs-nav{max-width:100%;min-width:0;overscroll-behavior-inline:contain}
- .menu.menu-fixed{max-width:calc(100vw - 16px);max-height:calc(var(--lml-vh,100dvh) - 16px)}
+ .menu.menu-fixed{max-width:calc(100vw - 16px);max-height:calc(var(--taj-vh,100dvh) - 16px)}
  .menu .mi{min-height:44px;white-space:normal}
  pre,.copy-field{max-width:100%;overflow-x:auto}
  .note,.modal-sub,.card-desc{overflow-wrap:anywhere}
@@ -1148,7 +1094,7 @@
 }
 @media(max-width:640px){
  .modal{padding:0;align-items:flex-end}
- .modal .modal-card,.modal.xwide .modal-card{max-height:calc(var(--lml-vh,100dvh) - env(safe-area-inset-top));border-radius:18px 18px 0 0}
+ .modal .modal-card,.modal.xwide .modal-card{max-height:calc(var(--taj-vh,100dvh) - env(safe-area-inset-top));border-radius:18px 18px 0 0}
  .modal-head{padding:12px;gap:8px}
  .modal-body{padding:12px}
  .modal-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom));gap:6px}
@@ -1157,8 +1103,8 @@
  .btn{max-width:100%}
  .tbl-toolbar .grow{flex-basis:100%;min-width:0}
  .page-head{flex-wrap:wrap;gap:10px}
- body:has(.modal.open,.drawer.open,.sb-drawer) #lmlReleaseBadge{display:none!important}
- #lmlReleaseBadge{max-width:calc(100vw - 24px);font-size:12px;padding:8px 12px;bottom:max(12px,env(safe-area-inset-bottom))!important;left:12px!important;z-index:100!important}
+ body:has(.modal.open,.drawer.open,.sb-drawer) #tajReleaseBadge{display:none!important}
+ #tajReleaseBadge{max-width:calc(100vw - 24px);font-size:12px;padding:8px 12px;bottom:max(12px,env(safe-area-inset-bottom))!important;left:12px!important;z-index:100!important}
 }
 @media(prefers-reduced-motion:reduce){.modal.open,.modal-card,.menu.open{animation:none!important}.sidebar{transition:none!important}}
 @media(max-width:640px){
@@ -1256,7 +1202,7 @@
 	<div class="sb-overlay" id="sbOverlay"></div>
 	<aside class="sidebar" id="sidebar">
 		<div class="sb-brand">
-				<div class="sb-logo sb-logo-lml"><svg viewBox="0 0 46 40" aria-hidden="true"><defs><linearGradient id="lmlGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c8cff"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><rect x="1" y="1" width="44" height="38" rx="12" fill="url(#lmlGradBrand)"/><g fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13v14h6"/><path d="M20 27V13l4.5 8.5L29 13v14"/><path d="M35 13v14h6"/></g></svg></div>
+				<div class="sb-logo sb-logo-taj"><svg viewBox="0 0 46 40" aria-hidden="true"><defs><linearGradient id="tajGradBrand" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c8cff"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><rect x="1" y="1" width="44" height="38" rx="12" fill="url(#tajGradBrand)"/><g fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13v14h6"/><path d="M20 27V13l4.5 8.5L29 13v14"/><path d="M35 13v14h6"/></g></svg></div>
 			<div class="sb-brand-text">
 						<div class="sb-brand-title">TAJPANEL <span class="beta-chip">BETA</span></div>
 				<div class="sb-brand-sub">مدیریت یکپارچه سرویس</div>
@@ -1317,13 +1263,13 @@
 			</div>
 <!-- ==================== DASHBOARD ==================== -->
 			<section class="view" id="view-dashboard">
-				<div class="lml-hero">
-					<div class="lml-hero-mark"><svg viewBox="0 0 46 40" aria-hidden="true"><defs><linearGradient id="lmlGradHero" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c8cff"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><rect x="1" y="1" width="44" height="38" rx="12" fill="url(#lmlGradHero)"/><g fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13v14h6"/><path d="M20 27V13l4.5 8.5L29 13v14"/><path d="M35 13v14h6"/></g></svg></div>
-					<div class="lml-hero-txt">
-						<div class="lml-hero-name">TAJPANEL <span class="lml-ver" id="lmlVer">v1.0.0</span></div>
-						<div class="lml-hero-sub">مدیریت یکپارچه سرویس‌های کانفیگ</div>
+				<div class="taj-hero">
+					<div class="taj-hero-mark"><svg viewBox="0 0 46 40" aria-hidden="true"><defs><linearGradient id="tajGradHero" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c8cff"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><rect x="1" y="1" width="44" height="38" rx="12" fill="url(#tajGradHero)"/><g fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13v14h6"/><path d="M20 27V13l4.5 8.5L29 13v14"/><path d="M35 13v14h6"/></g></svg></div>
+					<div class="taj-hero-txt">
+						<div class="taj-hero-name">TAJPANEL <span class="taj-ver" id="tajVer">v1.0.0</span></div>
+						<div class="taj-hero-sub">مدیریت یکپارچه سرویس‌های کانفیگ</div>
 					</div>
-					<div class="lml-hero-free">
+					<div class="taj-hero-free">
 						<svg><use href="#i-heart"/></svg>
 						<div><b>این پنل رایگان است 🎁</b><span>استفاده از آن برای همه آزاد و بدون هزینه است</span></div>
 					</div>
@@ -1670,7 +1616,7 @@
 								</div>
 								<div class="note info" style="margin-top:12px">
 									<svg><use href="#i-info"/></svg>
-									<div>آی‌پی‌ها از مخزن عمومی LML دریافت می‌شوند و برای ساخت کانفیگ‌های دارای آی‌پی تمیز استفاده می‌گردند.</div>
+									<div>آی‌پی‌ها از مخزن عمومی TAJ دریافت می‌شوند و برای ساخت کانفیگ‌های دارای آی‌پی تمیز استفاده می‌گردند.</div>
 								</div>
 							</div>
 							<div class="card">
@@ -1789,7 +1735,7 @@
 								<form id="voucherForm">
 									<div class="field">
 										<label for="voucherCode">کد کارت شارژ</label>
-										<input type="text" class="input input-mono" id="voucherCode" placeholder="LML-50GB-30D" autocomplete="off">
+										<input type="text" class="input input-mono" id="voucherCode" placeholder="TAJ-50GB-30D" autocomplete="off">
 										<span class="hint">فقط حروف، اعداد و خط تیره</span>
 									</div>
 									<div class="form-row">
@@ -2159,37 +2105,28 @@
 									<div class="field">
 										<label for="setTheme">تم رنگی</label>
 										<select class="select" id="setTheme">
-											<option value="dark">تیره</option>
-											<option value="light">روشن</option>
-											<option value="midnight">🌌 نیمه‌شب آبی</option>
-											<option value="royal">👑 بنفش سلطنتی</option>
-											<option value="forest">🌲 سبز جنگلی</option>
-											<option value="crimson">🔴 سرخ کریمسون</option>
-											<option value="ocean">🌊 فیروزه‌ای اقیانوس</option>
-											<option value="pink">🌸 صورتی نئونی</option>
-											<option value="yellow">☀️ زرد فسفری</option>
+											<option value="pink">🌸 صورتی</option>
+											<option value="yellow">☀️ زرد</option>
 											<option value="phosphor">🟢 سبز فسفری</option>
-											<option value="black">⬛ سیاه مطلق</option>
-											<option value="beige">🟫 بژ کلاسیک</option>
-											<option value="blue">💧 آبی اقیانوسی</option>
+											<option value="black">⬛ سیاه</option>
+											<option value="beige">🟫 بژ</option>
+											<option value="blue">💧 آبی</option>
+											<option value="navy">🌊 سورمه‌ای</option>
+											<option value="orange">🔥 نارنجی</option>
 										</select>
 									</div>
 									<div class="field">
 										<div class="field" style="flex-basis:100%">
 										<label>گالری تم‌ها — لمس کنید تا اعمال شود</label>
 										<div id="tajThemeGallery" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">
-											<button type="button" class="taj-swatch" data-theme="dark" style="background:linear-gradient(135deg,#08090c,#14171e)" title="تیره"></button>
-											<button type="button" class="taj-swatch" data-theme="light" style="background:linear-gradient(135deg,#f4f5f8,#ffffff)" title="روشن"></button>
-											<button type="button" class="taj-swatch" data-theme="pink" style="background:linear-gradient(135deg,#140a11,#ff2d97)" title="صورتی"></button>
-											<button type="button" class="taj-swatch" data-theme="yellow" style="background:linear-gradient(135deg,#141003,#f7ff00)" title="زرد فسفری"></button>
+											<button type="button" class="taj-swatch" data-theme="pink" style="background:linear-gradient(135deg,#150a12,#ff2d97)" title="صورتی"></button>
+											<button type="button" class="taj-swatch" data-theme="yellow" style="background:linear-gradient(135deg,#151103,#f7ff00)" title="زرد"></button>
 											<button type="button" class="taj-swatch" data-theme="phosphor" style="background:linear-gradient(135deg,#020b04,#00ff41)" title="سبز فسفری"></button>
 											<button type="button" class="taj-swatch" data-theme="black" style="background:#000;border:1px solid var(--border-strong)" title="سیاه"></button>
 											<button type="button" class="taj-swatch" data-theme="beige" style="background:linear-gradient(135deg,#f2ece0,#a9712b)" title="بژ"></button>
 											<button type="button" class="taj-swatch" data-theme="blue" style="background:linear-gradient(135deg,#040d1a,#2f7bff)" title="آبی"></button>
-											<button type="button" class="taj-swatch" data-theme="midnight" style="background:linear-gradient(135deg,#050a18,#3b82f6)" title="نیمه‌شب"></button>
-											<button type="button" class="taj-swatch" data-theme="royal" style="background:linear-gradient(135deg,#0a0614,#a855f7)" title="سلطنتی"></button>
-											<button type="button" class="taj-swatch" data-theme="forest" style="background:linear-gradient(135deg,#050f0a,#22c55e)" title="جنگلی"></button>
-											<button type="button" class="taj-swatch" data-theme="ocean" style="background:linear-gradient(135deg,#041014,#06b6d4)" title="اقیانوس"></button>
+											<button type="button" class="taj-swatch" data-theme="navy" style="background:linear-gradient(135deg,#020816,#3b6ef7)" title="سورمه‌ای"></button>
+											<button type="button" class="taj-swatch" data-theme="orange" style="background:linear-gradient(135deg,#160b02,#ff7a00)" title="نارنجی"></button>
 										</div>
 									</div>
 <label for="setDensity">تراکم نمایش</label>
@@ -2482,7 +2419,7 @@
 							<div class="field">
 								<label for="fName">نام کاربری <span style="color:var(--err)">*</span></label>
 								<div class="input-group">
-									<input type="text" class="input input-mono" id="fName" placeholder="lml" autocomplete="off" spellcheck="false">
+									<input type="text" class="input input-mono" id="fName" placeholder="taj" autocomplete="off" spellcheck="false">
 									<button type="button" class="btn" id="btnRandomName"><svg><use href="#i-shuffle"/></svg>نام تصادفی</button>
 								</div>
 								<span class="hint">فقط حروف انگلیسی، اعداد، خط تیره و آندرلاین</span>
@@ -2600,12 +2537,12 @@
 									<button type="button" class="btn btn-sm" id="btnOpenIpRepo3"><svg><use href="#i-globe"/></svg>اسکنر آی‌پی</button>
 								</div>
 								<textarea class="input" id="fIps" placeholder="104.16.0.1" rows="4"></textarea>
-								<div class="lml-ip-actions">
+								<div class="taj-ip-actions">
 									<button type="button" class="btn btn-sm" id="btnFilterIps"><svg><use href="#i-filter"/></svg>مرتب‌سازی آی‌پی‌ها</button>
 									<button type="button" class="btn btn-sm" id="btnTestIps"><svg><use href="#i-activity"/></svg>تست آی‌پی تمیز</button>
-									<button type="button" class="btn btn-sm" id="btnOpenLmlRepo"><svg><use href="#i-globe"/></svg>مخزن آی‌پی تمیز</button>
+									<button type="button" class="btn btn-sm" id="btnOpenTajRepo"><svg><use href="#i-globe"/></svg>مخزن آی‌پی تمیز</button>
 								</div>
-								<div class="lml-ip-status" id="sslTestStatus" style="display:none"></div>
+								<div class="taj-ip-status" id="sslTestStatus" style="display:none"></div>
 								<div class="note" style="margin-top:8px"><svg><use href="#i-info"/></svg><div>کانفیگ‌ها <b>فقط روی پورت‌های TLS که تیک زده‌اید</b> ساخته می‌شوند (443، 2053 و…) — هیچ لینک پورت 80/بدونTLS ساخته نمی‌شود. دو خانواده لینک: <b>آی‌پی تمیز + TLS</b> (SNI=دامنه، allowInsecure=1 ⇒ بدون خطای SSL/CCL) و <b>دامنه + TLS</b>. آی‌پی باید لبه‌ی کلودفلر باشد تا کانفیگ بسازد؛ دکمهٔ <b>«تست آی‌پی تمیز»</b> با handshake واقعی بررسی و آی‌پی‌های غیرکلودفلر را خودکار حذف می‌کند. 💡 برای لوکیشن خارجی و اتصال پایدار: «مخزن ساکس پروکسی» در تب پروکسی خروجی.</div></div>
 							</div>
 							<div class="switch-row">
@@ -2891,7 +2828,7 @@
 			<div class="modal-body">
 				<div class="field">
 					<label for="mvCode">کد کارت شارژ</label>
-					<input type="text" class="input input-mono" id="mvCode" placeholder="LML-50GB-30D" autocomplete="off">
+					<input type="text" class="input input-mono" id="mvCode" placeholder="TAJ-50GB-30D" autocomplete="off">
 				</div>
 				<div class="form-row">
 					<div class="field">
@@ -2991,29 +2928,29 @@
 	</div>
 </div>
 
-<div class="modal narrow" id="modalIps"><div class="modal-card"><div class="modal-head"><div class="mh-text"><h3 class="modal-title">اسکنر مستقل LML</h3><p class="modal-sub">نسخه 1.0.0 • تست واقعی از اینترنت شما</p></div><button class="icon-btn" data-close-modal="modalIps">×</button></div><div class="modal-body">
+<div class="modal narrow" id="modalIps"><div class="modal-card"><div class="modal-head"><div class="mh-text"><h3 class="modal-title">اسکنر مستقل TAJ</h3><p class="modal-sub">نسخه 1.0.0 • تست واقعی از اینترنت شما</p></div><button class="icon-btn" data-close-modal="modalIps">×</button></div><div class="modal-body">
 <div class="note">اسکن دقیق با موتور محلی روی اینترنت خودتان انجام می‌شود و خروجی JSON آن اینجا وارد می‌شود. اگر اسکنر ندارید، از دکمهٔ <b>«مخزن آی‌پی تمیز»</b> کنار فیلد آی‌پی استفاده کنید — آی‌پی‌ها زنده و خودکار از دیتاسنترهای کلودفلر سراسر جهان پر می‌شوند (هر ۱۰ دقیقه).</div>
-<h4>۱. دریافت و اجرا</h4><p>روی ویندوز Python 3.9 یا جدیدتر، و روی اندروید Pydroid نصب کنید. فایل را دانلود و اجرا کنید؛ رابط در مرورگر باز می‌شود. اگر خودکار باز نشد، آدرس چاپ‌شده در ترمینال را باز کنید.</p><a class="btn btn-primary" href="/lml-scanner/download" download>دانلود موتور مستقل</a><pre dir="ltr">python TAJ-Scanner.py</pre>
+<h4>۱. دریافت و اجرا</h4><p>روی ویندوز Python 3.9 یا جدیدتر، و روی اندروید Pydroid نصب کنید. فایل را دانلود و اجرا کنید؛ رابط در مرورگر باز می‌شود. اگر خودکار باز نشد، آدرس چاپ‌شده در ترمینال را باز کنید.</p><a class="btn btn-primary" href="/taj-scanner/download" download>دانلود موتور مستقل</a><pre dir="ltr">python TAJ-Scanner.py</pre>
 <h4>۲. تست دامنهٔ خودتان</h4><p>دامنه همین پنل را در اسکنر وارد کنید. فایل Worker جدید باید قبلاً مستقر شده باشد. پس از اسکن، «خروجی JSON برای پنل» بگیرید.</p>
-<h4>۳. ورود و اعمال نتایج</h4><input class="input" type="file" id="lmlScanFile" accept=".json,application/json"><label>حداکثر آی‌پی قابل اعمال<input class="input" id="ipCount" type="number" min="1" max="100" value="10"></label><p id="lmlImportSummary">فایلی انتخاب نشده است.</p><div id="ipLoading" class="scan-log hidden"></div><p>نتایج مربوط به اینترنتِ زمان تست هستند. هنگام اعمال، چرخش تصادفی خاموش می‌شود. سپس فرم کاربر را ذخیره کنید. برای تست مجدد همان آی‌پی‌ها، آن‌ها را در بخش دلخواه اسکنر وارد کنید.</p>
+<h4>۳. ورود و اعمال نتایج</h4><input class="input" type="file" id="tajScanFile" accept=".json,application/json"><label>حداکثر آی‌پی قابل اعمال<input class="input" id="ipCount" type="number" min="1" max="100" value="10"></label><p id="tajImportSummary">فایلی انتخاب نشده است.</p><div id="ipLoading" class="scan-log hidden"></div><p>نتایج مربوط به اینترنتِ زمان تست هستند. هنگام اعمال، چرخش تصادفی خاموش می‌شود. سپس فرم کاربر را ذخیره کنید. برای تست مجدد همان آی‌پی‌ها، آن‌ها را در بخش دلخواه اسکنر وارد کنید.</p>
 </div><div class="modal-foot"><button class="btn" data-close-modal="modalIps">بستن</button><button class="btn btn-primary" id="btnApplyIps" disabled>اعمال بهترین‌ها در فرم کاربر</button></div></div></div>
 <div class="modal" id="modalIpRepo"><div class="modal-card"><div class="modal-head"><div class="mh-icon" style="background:var(--accent-soft);color:var(--accent)"><svg><use href="#i-globe"/></svg></div><div class="mh-text"><h3 class="modal-title">مخزن آی‌پی تمیز</h3><p class="modal-sub">منابع جهانی (۱۰۰ آی‌پی زنده) • منبع خارجی • تأییدشده‌های ایران</p></div><button type="button" class="icon-btn" data-close-modal="modalIpRepo"><svg><use href="#i-x"/></svg></button></div><div class="modal-body">
 <h4>🌍 مخزن جهانی آی‌پی تمیز (هر ۱۰ دقیقه تازه — دیتاسنترهای کلودفلر سراسر جهان)</h4>
-<p id="lmlGhRepoInfo" style="font-size:12px;color:var(--text-3)">در حال دریافت مخزن جهانی...</p>
-<div id="lmlGhRepoList" class="scan-log" style="max-height:230px;overflow:auto"></div>
+<p id="tajGhRepoInfo" style="font-size:12px;color:var(--text-3)">در حال دریافت مخزن جهانی...</p>
+<div id="tajGhRepoList" class="scan-log" style="max-height:230px;overflow:auto"></div>
 <h4 style="margin-top:12px">🔗 منبع زندهٔ خارجی (لینک اشتراک دلخواه)</h4>
 <div style="display:flex;gap:8px;margin:6px 0">
-<input class="input" id="lmlExtSourceInput" dir="ltr" placeholder="https://example.com/sub?token=..." style="flex:1;font-size:11.5px">
+<input class="input" id="tajExtSourceInput" dir="ltr" placeholder="https://example.com/sub?token=..." style="flex:1;font-size:11.5px">
 <button type="button" class="btn btn-sm" id="btnSaveExtSource">ذخیرهٔ منبع</button>
 </div>
-<p id="lmlExtSourceStatus" style="font-size:11.5px;color:var(--text-3)">منبعی تنظیم نشده — لینک اشتراک هر سرویسی را ذخیره کنید تا آی‌پی‌هایش زنده به مخزن اضافه شود.</p>
-<div id="lmlExtRepoList" class="scan-log" style="max-height:120px;overflow:auto"></div>
+<p id="tajExtSourceStatus" style="font-size:11.5px;color:var(--text-3)">منبعی تنظیم نشده — لینک اشتراک هر سرویسی را ذخیره کنید تا آی‌پی‌هایش زنده به مخزن اضافه شود.</p>
+<div id="tajExtRepoList" class="scan-log" style="max-height:120px;overflow:auto"></div>
 <h4 style="margin-top:12px">🏆 مخزن آی‌پی تمیز کلودفلر (پرشوندهٔ خودکار از تست‌های سراسر ایران)</h4>
-<p id="lmlPoolInfo" style="font-size:12px;color:var(--text-3)"></p>
-<div id="lmlPoolList" class="scan-log" style="max-height:150px;overflow:auto"></div>
+<p id="tajPoolInfo" style="font-size:12px;color:var(--text-3)"></p>
+<div id="tajPoolList" class="scan-log" style="max-height:150px;overflow:auto"></div>
 <p style="font-size:11px;color:var(--text-3);line-height:1.9">هر آی‌پی که در پنل تست شود یا از اسکنر مستقل (تست روی اینترنت واقعی ایران) وارد شود، <b>درجا و خودکار</b> به مخزن آی‌پی تمیز کلودفلر فرستاده می‌شود — بدون نمایش هیچ جزئیاتی، فقط پرچم کشور. افزودن به فرم کاربر فقط دستی است.</p>
 </div><div class="modal-foot"><button class="btn" data-close-modal="modalIpRepo">بستن</button><button class="btn btn-primary" id="btnGhRepoAdd" disabled>افزودن انتخاب‌شده‌ها به آی‌پی‌های کاربر</button></div></div></div>
-<div class="modal narrow" id="lmlReleaseModal"><div class="modal-card"><div class="modal-head"><h3 class="modal-title">تازه‌های LML</h3><button class="icon-btn" data-close-modal="lmlReleaseModal">×</button></div><div class="modal-body"><h4 id="lmlReleaseVersion"></h4><ul id="lmlReleaseNotes"></ul><p>این اعلان با انتشار Worker جدید روی دامنهٔ خودتان به‌روز می‌شود. هیچ سورسی از سرور شخص ثالث نصب نمی‌شود.</p></div><div class="modal-foot"><button class="btn btn-primary" id="lmlReleaseSeen">متوجه شدم</button><button class="btn" id="lmlReleaseRefresh">بارگذاری نسخهٔ منتشرشده</button></div></div></div>
+<div class="modal narrow" id="tajReleaseModal"><div class="modal-card"><div class="modal-head"><h3 class="modal-title">تازه‌های TAJ</h3><button class="icon-btn" data-close-modal="tajReleaseModal">×</button></div><div class="modal-body"><h4 id="tajReleaseVersion"></h4><ul id="tajReleaseNotes"></ul><p>این اعلان با انتشار Worker جدید روی دامنهٔ خودتان به‌روز می‌شود. هیچ سورسی از سرور شخص ثالث نصب نمی‌شود.</p></div><div class="modal-foot"><button class="btn btn-primary" id="tajReleaseSeen">متوجه شدم</button><button class="btn" id="tajReleaseRefresh">بارگذاری نسخهٔ منتشرشده</button></div></div></div>
 
 <!-- ==================== PUBLIC PROXY SCANNER MODAL ==================== -->
 <div class="modal narrow" id="modalProxyScan">
@@ -3102,7 +3039,7 @@
 		<div class="modal-body">
 			<div class="note"><svg><use href="#i-info"/></svg><div>توکن کلودفلر شما در این پنل ذخیره نشده است. برای فعال‌سازی آپدیت خودکار، توکن را دریافت و وارد کنید.</div></div>
 			<div style="margin:14px 0">
-				<a class="btn btn-block" href="https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_subdomain%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%5D&amp;accountId=*&amp;zoneId=all&amp;name=LML-Deployer-Token" target="_blank" rel="noopener"><svg><use href="#i-external"/></svg>دریافت توکن کلودفلر</a>
+				<a class="btn btn-block" href="https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22workers_kv_storage%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_settings%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_subdomain%22%2C%22type%22%3A%22edit%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%5D&amp;accountId=*&amp;zoneId=all&amp;name=TAJ-Deployer-Token" target="_blank" rel="noopener"><svg><use href="#i-external"/></svg>دریافت توکن کلودفلر</a>
 			</div>
 			<div class="field">
 				<label for="tokenInput">توکن</label>
@@ -3201,7 +3138,7 @@ var State = {
 	tableHover: false,
 	pendingTableRender: false
 };
-window.LML = State;
+window.TAJ = State;
 
 /* ============================================================
    1. DOM HELPERS
@@ -3500,15 +3437,15 @@ function openMenu(anchor, items) {
    ============================================================ */
 function copyText(text, msg) {
 	/* v1.0.6: multi-step copy - never fails silently */
-	return lmlCopy(text, msg || '\u2705 \u06a9\u067e\u06cc \u0634\u062f!');
+	return tajCopy(text, msg || '\u2705 \u06a9\u067e\u06cc \u0634\u062f!');
 }
 function legacyCopy(text, done) {
-	var ok = lmlExecCopy(text, '');
-	if (ok) { try { done(); } catch (e) { } } else { try { lmlCopyBox(text); } catch (e) { } }
+	var ok = tajExecCopy(text, '');
+	if (ok) { try { done(); } catch (e) { } } else { try { tajCopyBox(text); } catch (e) { } }
 }
 window.copyText = copyText;
 window.legacyCopy = legacyCopy;
-try { window.lmlToastImpl = toast; } catch (e) { }
+try { window.tajToastImpl = toast; } catch (e) { }
 
 document.addEventListener('click', function (e) {
 	var btn = e.target.closest ? e.target.closest('[data-copy-target]') : null;
@@ -3851,13 +3788,13 @@ var QRLib = (function () {
 				ctx.drawImage(img, 0, 0);
 				var a = document.createElement('a');
 				a.href = cv.toDataURL('image/png');
-				a.download = (filename || 'lml-qr') + '.png';
+				a.download = (filename || 'taj-qr') + '.png';
 				a.click();
-			} catch (e) { saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'lml-qr') + '.svg'); }
+			} catch (e) { saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'taj-qr') + '.svg'); }
 		};
-		img.onerror = function () { if (done) return; done = true; saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'lml-qr') + '.svg'); };
+		img.onerror = function () { if (done) return; done = true; saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'taj-qr') + '.svg'); };
 		img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(xml)));
-		setTimeout(function () { if (!done) { done = true; saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'lml-qr') + '.svg'); } }, 1500);
+		setTimeout(function () { if (!done) { done = true; saveBlob(new Blob([xml], { type: 'image/svg+xml' }), (filename || 'taj-qr') + '.svg'); } }, 1500);
 	}
 	function saveBlob(blob, name) {
 		var url = URL.createObjectURL(blob);
@@ -4014,7 +3951,7 @@ function loadUsers(silent) {
 				renderUsersUI(data);
 			} catch (renderErr) {
 				State.lastRenderError = (renderErr && renderErr.message) || String(renderErr);
-				try { if (window.console && console.error) console.error('[LML] render error:', renderErr); } catch (e) { }
+				try { if (window.console && console.error) console.error('[TAJ] render error:', renderErr); } catch (e) { }
 				/* one-time, non-alarming notice - the badge stays green */
 				if (!State.renderErrorShown) {
 					State.renderErrorShown = true;
@@ -4135,7 +4072,7 @@ function applyUserFilter(users, f, serverTime) {
 		}
 		if (f.sort === 'newest') {
 			var order = [];
-			try { order = JSON.parse(localStorage.getItem('lml_users_custom_order') || '[]'); } catch (e) { }
+			try { order = JSON.parse(localStorage.getItem('taj_users_custom_order') || '[]'); } catch (e) { }
 			if (order && order.length) {
 				var ia = order.indexOf(a.username), ib = order.indexOf(b.username);
 				if (ia !== -1 && ib !== -1) return ia - ib;
@@ -4324,30 +4261,30 @@ function getUser(username) {
 	return null;
 }
 /* دامنه و origin پنل: اگر پنل را با آی‌پی باز کرده باشید، آی‌پی هرگز در لینک نمی‌آید */
-function lmlPanelHostName() {
-	return (window.LML_PANEL_HOST && window.LML_PANEL_HOST.length) ? window.LML_PANEL_HOST : window.location.hostname;
+function tajPanelHostName() {
+	return (window.TAJ_PANEL_HOST && window.TAJ_PANEL_HOST.length) ? window.TAJ_PANEL_HOST : window.location.hostname;
 }
-function lmlPanelOrigin() {
+function tajPanelOrigin() {
 	var proto = (window.location.protocol === 'http:') ? 'http://' : 'https://';
-	return proto + lmlPanelHostName();
+	return proto + tajPanelHostName();
 }
-function getSubLink(username) { return lmlPanelOrigin() + '/feed/' + encodeURIComponent(username); }
-function getSubTextLink(username) { return lmlPanelOrigin() + '/sub/' + encodeURIComponent(username); }
-function getSingboxLink(username) { return lmlPanelOrigin() + '/singbox/' + encodeURIComponent(username); }
-function getV2JsonLink(username) { return lmlPanelOrigin() + '/v2json/' + encodeURIComponent(username); }
-function getStatusLink(username) { return lmlPanelOrigin() + '/status/' + encodeURIComponent(username); }
-function getPortalLink(username) { return lmlPanelOrigin() + '/s/' + encodeURIComponent(username); }
+function getSubLink(username) { return tajPanelOrigin() + '/feed/' + encodeURIComponent(username); }
+function getSubTextLink(username) { return tajPanelOrigin() + '/sub/' + encodeURIComponent(username); }
+function getSingboxLink(username) { return tajPanelOrigin() + '/singbox/' + encodeURIComponent(username); }
+function getV2JsonLink(username) { return tajPanelOrigin() + '/v2json/' + encodeURIComponent(username); }
+function getStatusLink(username) { return tajPanelOrigin() + '/status/' + encodeURIComponent(username); }
+function getPortalLink(username) { return tajPanelOrigin() + '/s/' + encodeURIComponent(username); }
 window.getSubLink = getSubLink;
 window.getSingboxLink = getSingboxLink;
 window.getV2JsonLink = getV2JsonLink;
 window.getStatusLink = getStatusLink;
 
-var LML_HTTP_TWIN = { '443': '80', '2053': '2052', '2083': '2082', '2087': '2086', '2096': '2095', '8443': '8080' };
+var TAJ_HTTP_TWIN = { '443': '80', '2053': '2052', '2083': '2082', '2087': '2086', '2096': '2095', '8443': '8080' };
 function getvIeesLink(username) {
 	var user = getUser(username);
 	if (!user) return '';
 	/* دامنه‌ی پنل: اگر پنل را با آی‌پی باز کرده باشید، همان آی‌پی هرگز در لینک نمی‌آید */
-	var host = (window.LML_PANEL_HOST && window.LML_PANEL_HOST.length) ? window.LML_PANEL_HOST : window.location.hostname;
+	var host = (window.TAJ_PANEL_HOST && window.TAJ_PANEL_HOST.length) ? window.TAJ_PANEL_HOST : window.location.hostname;
 	/* IP-FREE: آی‌پی کاربر هم در لینک TLS (با SNI=دامنه) و هم بدون TLS می‌آید */
 	var cleanIps = Array.isArray(user.ips_valid) ? user.ips_valid.slice(0, 40) : [];
 	var ips = [host];
@@ -4358,7 +4295,7 @@ function getvIeesLink(username) {
 	var fpPoolP = ['chrome', 'firefox', 'safari', 'ios', 'android', 'edge', '360', 'qq'];
 	var fpRawP = String(user.fingerprint || 'chrome').toLowerCase();
 	var fp = (fpRawP === 'random' || fpRawP === 'randomized') ? fpPoolP[Math.floor(Math.random() * fpPoolP.length)] : (user.fingerprint || 'chrome');
-	var dynPath = encodeURIComponent('/stream/LML_PANEL/' + (user.uuid ? user.uuid.split('-')[4] : 'default'));
+	var dynPath = encodeURIComponent('/stream/TAJ_PANEL/' + (user.uuid ? user.uuid.split('-')[4] : 'default'));
 	var links = [];
 	var m1 = decodeURIComponent('%E2%9A%A0%EF%B8%8F%D9%BE%D9%86%D9%84%20%D8%B1%D8%A7%DB%8C%DA%AF%D8%A7%D9%86%20%D9%88%20%D8%BA%DB%8C%D8%B1%20%D9%82%D8%A7%D8%A8%D9%84%20%D9%81%D8%B1%D9%88%D8%B4%E2%9A%A0%EF%B8%8F');
 	var m2 = '💎 TAJ-CONNECT ❯ [SECURE-MESH]';
@@ -4385,7 +4322,7 @@ function getvIeesLink(username) {
 	}
 	var infoRemark = '📊 remaining | ‎' + remVol + ' | ‎' + remTime + ' | ‎' + remReq;
 
-	var rawPath = '/stream/LML_PANEL/' + (user.uuid ? user.uuid.split('-')[4] : 'default');
+	var rawPath = '/stream/TAJ_PANEL/' + (user.uuid ? user.uuid.split('-')[4] : 'default');
 	var proxyList = [];
 	try {
 		if (user.user_socks5 && String(user.user_socks5).trim().charAt(0) === '[') proxyList = JSON.parse(user.user_socks5);
@@ -4416,10 +4353,10 @@ function getvIeesLink(username) {
 
 	/* v1.0.0-FINAL: بدون فیلتر — همهٔ آی‌پی‌ها (کلودفلری یا غیرکلودفلری، v4 یا v6) در کانفیگ می‌مانند */
 	var tlsIpsP = cleanIps.slice();
-	var lmlEntries = [];
-	tlsIpsP.forEach(function (cip) { ports.forEach(function (p) { lmlEntries.push({ addr: cip, port: p, tls: true, ip: cip }); }); });
-	ips.forEach(function (h) { ports.forEach(function (p) { lmlEntries.push({ addr: h, port: p, tls: true, ip: '' }); }); });
-	lmlEntries.forEach(function (entry) {
+	var tajEntries = [];
+	tlsIpsP.forEach(function (cip) { ports.forEach(function (p) { tajEntries.push({ addr: cip, port: p, tls: true, ip: cip }); }); });
+	ips.forEach(function (h) { ports.forEach(function (p) { tajEntries.push({ addr: h, port: p, tls: true, ip: '' }); }); });
+	tajEntries.forEach(function (entry) {
 			resolvedProxies.forEach(function (proxy) {
 				var ip = entry.addr;
 				var ipU = String(ip).indexOf(':') >= 0 ? '[' + ip + ']' : ip;
@@ -4437,7 +4374,7 @@ function getvIeesLink(username) {
 				var isChainedP = String(proxy.currentDynPath).indexOf('loc-') >= 0;
 				var chainFlagP = (isChainedP && proxy.flagEmoji && proxy.flagEmoji !== '🌐') ? (proxy.flagEmoji + ' ') : '';
 				var ipPartP = entry.ip ? ((ipCcP && !isChainedP ? flagText(ipCcP) + ' ' : '') + entry.ip + ' ') : '';
-				var remark = 'LML | ' + chainFlagP + ipPartP + user.username;
+				var remark = 'TAJ | ' + chainFlagP + ipPartP + user.username;
 				if (enableVless) {
 					links.push('vless://' + (user.uuid || '') + '@' + ipU + ':' + portStr + '?path=' + proxy.currentDynPath + '&security=' + tlsVal + '&encryption=none&host=' + host + '&type=ws' + tlsParams + userFrag + '#' + encodeURIComponent(remark));
 				}
@@ -4464,16 +4401,16 @@ function copyConfig(username) {
 	if (!txt.replace(/\s/g, '')) {
 		var sub = '';
 		try { sub = getSubLink(username); } catch (e) { sub = ''; }
-		if (sub) { lmlCopy(sub, '\u26a0\ufe0f \u0644\u06cc\u0646\u06a9 \u0633\u0627\u0628 \u06a9\u067e\u06cc \u0634\u062f!'); return; }
-		lmlToastSafe('\u26a0\ufe0f \u06a9\u0627\u0646\u0641\u06cc\u06af\u06cc \u0633\u0627\u062e\u062a\u0647 \u0646\u0634\u062f\u061b \u0635\u0641\u062d\u0647 \u0631\u0627 \u0631\u0641\u0631\u0634 \u06a9\u0646\u06cc\u062f.', 'warn');
+		if (sub) { tajCopy(sub, '\u26a0\ufe0f \u0644\u06cc\u0646\u06a9 \u0633\u0627\u0628 \u06a9\u067e\u06cc \u0634\u062f!'); return; }
+		tajToastSafe('\u26a0\ufe0f \u06a9\u0627\u0646\u0641\u06cc\u06af\u06cc \u0633\u0627\u062e\u062a\u0647 \u0646\u0634\u062f\u061b \u0635\u0641\u062d\u0647 \u0631\u0627 \u0631\u0641\u0631\u0634 \u06a9\u0646\u06cc\u062f.', 'warn');
 		return;
 	}
-	lmlCopy(txt, '✅ کانفیگ کپی شد!');
+	tajCopy(txt, '✅ کانفیگ کپی شد!');
 }
 function copySubLink(enc) { var u = decodeURIComponent(enc); copyText(getSubLink(u), '✅ لینک سابسکریپشن کپی شد!'); }
 function copySingboxLink(enc) { var u = decodeURIComponent(enc); copyText(getSingboxLink(u), '✅ لینک Sing-box کپی شد!'); }
 /* گرفتن مستقیم JSON کانفیگ از پنل — v2rayNG یا Sing-box (کپی/دانلود) */
-async function lmlFetchJsonConfig(url) {
+async function tajFetchJsonConfig(url) {
 	var res = await fetch(url, { cache: 'no-store' });
 	if (!res.ok) throw new Error('HTTP ' + res.status);
 	var txt = await res.text();
@@ -4483,15 +4420,15 @@ async function lmlFetchJsonConfig(url) {
 async function copyConfigJson(url, what) {
 	try {
 		toast('⏳ در حال دریافت JSON (' + what + ')...', 'info');
-		var txt = await lmlFetchJsonConfig(url);
-		lmlCopy(txt, '✅ JSON مخصوص ' + what + ' کپی شد!');
+		var txt = await tajFetchJsonConfig(url);
+		tajCopy(txt, '✅ JSON مخصوص ' + what + ' کپی شد!');
 	} catch (e) {
 		toast('❌ دریافت JSON ناموفق: ' + (e && e.message ? e.message : e), 'err', 9000);
 	}
 }
 async function downloadConfigJson(url, filename) {
 	try {
-		var txt = await lmlFetchJsonConfig(url);
+		var txt = await tajFetchJsonConfig(url);
 		var blob = new Blob([txt], { type: 'application/json' });
 		var a = document.createElement('a');
 		a.href = URL.createObjectURL(blob);
@@ -4505,9 +4442,9 @@ async function downloadConfigJson(url, filename) {
 	}
 }
 async function copyV2Json(username) { return copyConfigJson(getV2JsonLink(username), 'v2rayNG'); }
-async function downloadV2Json(username) { return downloadConfigJson(getV2JsonLink(username), 'lml-' + username + '-v2ray.json'); }
+async function downloadV2Json(username) { return downloadConfigJson(getV2JsonLink(username), 'taj-' + username + '-v2ray.json'); }
 async function copySingboxJson(username) { return copyConfigJson(getSingboxLink(username), 'Sing-box'); }
-async function downloadSingboxJson(username) { return downloadConfigJson(getSingboxLink(username), 'lml-' + username + '-singbox.json'); }
+async function downloadSingboxJson(username) { return downloadConfigJson(getSingboxLink(username), 'taj-' + username + '-singbox.json'); }
 window.copyV2Json = copyV2Json;
 window.downloadV2Json = downloadV2Json;
 window.copySingboxJson = copySingboxJson;
@@ -4542,25 +4479,25 @@ window.showSingboxQr = showSingboxQr;
 on($('btnDownloadQr'), 'click', function () {
 	var box = $('qrContainer');
 	if (!box || !box.firstChild) { toast('تصویری برای دانلود وجود ندارد', 'warn'); return; }
-	QRLib.download(box, 'lml-qr');
+	QRLib.download(box, 'taj-qr');
 	toast('✅ تصویر QR دانلود شد');
 });
 
 /**
  * Per-user location marker used by the edge router:
- *   /stream/LML_PANEL/{uuid-tail}            -> direct
- *   /stream/LML_PANEL/{uuid-tail}/loc-{idx}  -> chained proxy #idx
+ *   /stream/TAJ_PANEL/{uuid-tail}            -> direct
+ *   /stream/TAJ_PANEL/{uuid-tail}/loc-{idx}  -> chained proxy #idx
  */
 function getLocPath(username, locIdx) {
 	var u = getUser(username);
 	if (!u || !u.uuid) return null;
 	var tail = String(u.uuid).split('-')[4] || 'default';
-	return '/stream/LML_PANEL/' + tail + (locIdx !== null && locIdx !== undefined && locIdx !== '' ? '/loc-' + locIdx : '');
+	return '/stream/TAJ_PANEL/' + tail + (locIdx !== null && locIdx !== undefined && locIdx !== '' ? '/loc-' + locIdx : '');
 }
 function getLocLink(username, locIdx) {
 	var p = getLocPath(username, locIdx);
 	if (!p) return '';
-	return 'https://' + lmlPanelHostName() + ':443?path=' + encodeURIComponent(p) + '&security=tls&encryption=none&host=' + lmlPanelHostName() + '&type=ws&sni=' + lmlPanelHostName();
+	return 'https://' + tajPanelHostName() + ':443?path=' + encodeURIComponent(p) + '&security=tls&encryption=none&host=' + tajPanelHostName() + '&type=ws&sni=' + tajPanelHostName();
 }
 
 /* ============================================================
@@ -4869,7 +4806,7 @@ function enableRowDrag(tbody) {
 		dragging.classList.remove('dragging');
 		tr.classList.remove('drop-target');
 		var order = Array.prototype.slice.call(tbody.querySelectorAll('tr')).map(function (r) { return r.getAttribute('data-username'); });
-		try { localStorage.setItem('lml_users_custom_order', JSON.stringify(order)); } catch (err) { }
+		try { localStorage.setItem('taj_users_custom_order', JSON.stringify(order)); } catch (err) { }
 	});
 }
 
@@ -5152,7 +5089,7 @@ function generateRandomUsername() {
 	var chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
 	var s = '';
 	for (var i = 0; i < 6; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
-	var username = 'lml_' + s;
+	var username = 'taj_' + s;
 	$('fName').value = username;
 	return username;
 }
@@ -5398,15 +5335,15 @@ window.openConfigCountWarning = openConfigCountWarning;
 
 /* ---------- created modal ---------- */
 function openCreatedModal(username, uuid) {
-	var subUrl = lmlPanelOrigin() + '/sub/' + encodeURIComponent(username);
-	var host = lmlPanelHostName();
+	var subUrl = tajPanelOrigin() + '/sub/' + encodeURIComponent(username);
+	var host = tajPanelHostName();
 	var vlessConfig = uuid
-		? 'vless://' + uuid + '@' + host + ':443?path=' + encodeURIComponent('/stream/LML_PANEL/' + (uuid.split('-')[4] || 'default')) + '&security=tls&encryption=none&host=' + host + '&type=ws&sni=' + host + '#' + encodeURIComponent('⚡ LML ❯ ' + username)
+		? 'vless://' + uuid + '@' + host + ':443?path=' + encodeURIComponent('/stream/TAJ_PANEL/' + (uuid.split('-')[4] || 'default')) + '&security=tls&encryption=none&host=' + host + '&type=ws&sni=' + host + '#' + encodeURIComponent('⚡ TAJ ❯ ' + username)
 		: subUrl;
 	$('createdSub').textContent = subUrl;
 	$('createdVless').value = vlessConfig;
 	renderQr('createdQr', subUrl, 190);
-	try { if (typeof lmlCopy === 'function') lmlCopy(subUrl, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(subUrl).catch(function () { }); } catch (e) { }
+	try { if (typeof tajCopy === 'function') tajCopy(subUrl, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(subUrl).catch(function () { }); } catch (e) { }
 	$('btnCreatedPortal').setAttribute('data-portal', username);
 	$('btnCreatedStatus').setAttribute('data-portal-status', username);
 	openModal('modalCreated');
@@ -5443,21 +5380,21 @@ async function fetchIpsList() {
    Official, published CIDR blocks for each network. Used when the worker
    cannot reach the live range APIs, so the scanner still returns genuine
    addresses instead of failing. */
-var LML_CDN_RANGES = {
+var TAJ_CDN_RANGES = {
 	cf: ["104.16.0.0/13", "172.64.0.0/13", "162.158.0.0/15", "188.114.96.0/20", "197.234.240.0/22", "172.66.0.0/16", "108.162.0.0/16", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22", "141.101.64.0/18", "190.93.240.0/20", "198.41.128.0/17"],
 	aws: ["13.32.0.0/15", "52.222.128.0/17", "99.84.0.0/16", "205.251.192.0/19", "108.156.0.0/14", "130.176.0.0/17", "54.230.0.0/16", "54.239.128.0/18", "143.204.0.0/16", "144.220.0.0/16"],
 	fastly: ["151.101.0.0/16", "199.232.0.0/16", "146.75.0.0/16", "199.116.208.0/21", "23.235.32.0/20", "104.156.80.0/20", "157.52.64.0/18", "172.111.64.0/18"],
 	google: ["142.250.0.0/15", "172.217.0.0/16", "216.58.192.0/19", "74.125.0.0/16", "173.194.0.0/16", "216.239.32.0/19", "108.177.0.0/17", "35.190.0.0/17"],
 	azure: ["13.64.0.0/11", "20.0.0.0/11", "104.40.0.0/13", "40.64.0.0/10", "51.4.0.0/15", "191.233.0.0/16", "52.146.0.0/17"]
 };
-function lmlIpToInt(ip) {
+function tajIpToInt(ip) {
 	var p = String(ip).split(".");
 	return (((+p[0] << 24) + (+p[1] << 16) + (+p[2] << 8) + (+p[3])) >>> 0);
 }
-function lmlIntToIp(n) {
+function tajIntToIp(n) {
 	return [((n >>> 24) & 255), ((n >>> 16) & 255), ((n >>> 8) & 255), (n & 255)].join(".");
 }
-function lmlIpsFromCidr(cidr, want) {
+function tajIpsFromCidr(cidr, want) {
 	var out = [];
 	var parts = String(cidr).split("/");
 	var base = parts[0];
@@ -5465,38 +5402,38 @@ function lmlIpsFromCidr(cidr, want) {
 	if (isNaN(bits) || bits < 8 || bits > 32) bits = 24;
 	var size = Math.pow(2, 32 - bits);
 	if (size < 4) return [base];
-	var start = lmlIpToInt(base);
+	var start = tajIpToInt(base);
 	var seen = {};
 	var tries = 0;
 	while (out.length < want && tries < want * 20) {
 		tries++;
 		var off = 1 + Math.floor(Math.random() * (size - 2));
-		var ip = lmlIntToIp((start + off) >>> 0);
+		var ip = tajIntToIp((start + off) >>> 0);
 		if (!seen[ip]) { seen[ip] = 1; out.push(ip); }
 	}
 	return out;
 }
 /* Always returns real addresses drawn from the official ranges above. */
-function lmlLocalScan(provs, count) {
+function tajLocalScan(provs, count) {
 	var picked = [];
 	var detail = {};
 	var share = Math.max(1, Math.round(count / (provs.length || 1)));
 	provs.forEach(function (p) {
-		var list = LML_CDN_RANGES[p] || [];
+		var list = TAJ_CDN_RANGES[p] || [];
 		if (!list.length) { detail[p] = 0; return; }
 		var got = [];
 		var guard = 0;
 		while (got.length < share && guard < share * 10) {
 			guard++;
 			var cidr = list[Math.floor(Math.random() * list.length)];
-			lmlIpsFromCidr(cidr, Math.min(10, share - got.length)).forEach(function (ip) {
+			tajIpsFromCidr(cidr, Math.min(10, share - got.length)).forEach(function (ip) {
 				if (got.indexOf(ip) < 0) got.push(ip);
 			});
 		}
 		detail[p] = got.length;
 		got.forEach(function (ip) { if (picked.indexOf(ip) < 0) picked.push(ip); });
 	});
-	return { ips: picked, detail: detail, totalRanges: provs.reduce(function (a, p) { return a + (LML_CDN_RANGES[p] || []).length; }, 0) };
+	return { ips: picked, detail: detail, totalRanges: provs.reduce(function (a, p) { return a + (TAJ_CDN_RANGES[p] || []).length; }, 0) };
 }
 
 async function openIpRepoModal() {
@@ -5508,14 +5445,14 @@ async function openIpRepoModal() {
 window.openIpSelectorModal = openIpRepoModal;
 
 var _ipScanning = false;
-var lmlImportedScan = null;
-on($('lmlScanFile'), 'change', async function(e) {
-    lmlImportedScan=null; $('btnApplyIps').disabled=true;
+var tajImportedScan = null;
+on($('tajScanFile'), 'change', async function(e) {
+    tajImportedScan=null; $('btnApplyIps').disabled=true;
     try {
         var file=e.target.files[0]; if(!file) return;
         if(file.size>1000000) throw Error('فایل بیش از حد بزرگ است');
         var data=JSON.parse(await file.text());
-        if(data.schema!=='lml-scan-v1' || !Array.isArray(data.results) || data.results.length>500) throw Error('فرمت خروجی معتبر نیست');
+        if(data.schema!=='taj-scan-v1' || !Array.isArray(data.results) || data.results.length>500) throw Error('فرمت خروجی معتبر نیست');
         /* سخت‌گیری دامنه حذف شد — نتیجهٔ اسکن با هر دامنه/آی‌پی معتبر پذیرفته می‌شود */
         if([443,2053,2083,2087,2096,8443].indexOf(data.port)<0) throw Error('پورت نامعتبر');
         var rows=data.results.filter(function(r){return r.healthy===true && r.successes>=2 && r.successes<=3 && typeof r.latency==='number' && Number.isFinite(r.latency) && r.latency>=0 && typeof r.ip==='string' && /^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$/.test(r.ip) && r.ip.split('.').every(function(n){return +n<=255;});});
@@ -5524,16 +5461,16 @@ on($('lmlScanFile'), 'change', async function(e) {
         if(!data.results.length) throw Error('نتیجه سالمی در فایل نیست');
         var age=Date.now()-Date.parse(data.created_at);
         if(!Number.isFinite(age)) age = 0;
-        lmlImportedScan=data;
-        $('lmlImportSummary').textContent=data.results.length+' آی‌پی سالم • پورت '+data.port+' • اینترنت: '+String(data.operator||'نامشخص')+(age>86400000?' • هشدار: نتایج بیش از ۲۴ ساعت قدمت دارند':'');
+        tajImportedScan=data;
+        $('tajImportSummary').textContent=data.results.length+' آی‌پی سالم • پورت '+data.port+' • اینترنت: '+String(data.operator||'نامشخص')+(age>86400000?' • هشدار: نتایج بیش از ۲۴ ساعت قدمت دارند':'');
         $('btnApplyIps').disabled=false;
-    } catch(err) { $('lmlImportSummary').textContent=err.message; }
+    } catch(err) { $('tajImportSummary').textContent=err.message; }
 });
 async function applySelectedIps() {
-    if(!lmlImportedScan) return;
+    if(!tajImportedScan) return;
     var count=Math.min(100,Math.max(1,parseInt(vval('ipCount'),10)||10));
-    var ips=lmlImportedScan.results.slice(0,count).map(function(r){return r.ip;});
-    vset('fIps',ips.join('\\n'));vchk('fAutoRotateIp',false);vset('fAutoRotate','0');vset('fIpCount',String(ips.length));$$('input[name="ports"]').forEach(function(c){c.checked=c.value===String(lmlImportedScan.port);});vset('fCustomPorts','');
+    var ips=tajImportedScan.results.slice(0,count).map(function(r){return r.ip;});
+    vset('fIps',ips.join('\\n'));vchk('fAutoRotateIp',false);vset('fAutoRotate','0');vset('fIpCount',String(ips.length));$$('input[name="ports"]').forEach(function(c){c.checked=c.value===String(tajImportedScan.port);});vset('fCustomPorts','');
     try { api('/api/ip-pool', { method: 'POST', body: { ips: ips } }).then(function () { }).catch(function () { }); } catch (e0) { }
     closeModal('modalIps');openModal('modalUser');
     toast('نتایج در فرم کاربر درج شد؛ مشخصات را بررسی و ذخیره کنید.', 'success');
@@ -5544,7 +5481,7 @@ on($('btnApplyIps'), 'click', applySelectedIps);
 on($('btnOpenIpRepo'), 'click', openIpRepoModal);
 on($('btnOpenIpRepo2'), 'click', openIpRepoModal);
 on($('btnOpenIpRepo3'), 'click', openIpRepoModal);
-on($('btnOpenLmlRepo'), 'click', function () { openModal('modalIpRepo'); lmlLoadGhRepo(); });
+on($('btnOpenTajRepo'), 'click', function () { openModal('modalIpRepo'); tajLoadGhRepo(); });
 /* نمایش آی‌پی + پرچم کشور مدیر در گوشهٔ نوار بالا */
 (async function () {
 	try {
@@ -5563,12 +5500,12 @@ on($('btnOpenLmlRepo'), 'click', function () { openModal('modalIpRepo'); lmlLoad
    مخزن آی‌پی گیت‌هاب (live-ips.json) — فقط افزودن دستی توسط مدیر
    هیچ آی‌پی‌ای به‌صورت خودکار به کاربران اضافه نمی‌شود.
    ============================================================ */
-async function lmlLoadGhRepo() {
-	var info = $('lmlGhRepoInfo'), box = $('lmlGhRepoList'), btn = $('btnGhRepoAdd');
+async function tajLoadGhRepo() {
+	var info = $('tajGhRepoInfo'), box = $('tajGhRepoList'), btn = $('btnGhRepoAdd');
 	if (!info || !box || !btn) return;
 	function repoRow(ip) {
 		var cw = crowdMap[ip];
-		return '<label style="display:flex;align-items:center;gap:8px;padding:3px 2px;cursor:pointer"><input type="checkbox" class="lml-gh-ip" value="' + attr(ip) + '" checked><span class="mono" dir="ltr">' + esc(ip) + '</span>' + (cw ? '<span style="font-size:10.5px;color:var(--text-3);margin-right:auto">📊 ' + cw.pct + '٪ سالم در ' + cw.regions + ' منطقه</span>' : '') + '</label>';
+		return '<label style="display:flex;align-items:center;gap:8px;padding:3px 2px;cursor:pointer"><input type="checkbox" class="taj-gh-ip" value="' + attr(ip) + '" checked><span class="mono" dir="ltr">' + esc(ip) + '</span>' + (cw ? '<span style="font-size:10.5px;color:var(--text-3);margin-right:auto">📊 ' + cw.pct + '٪ سالم در ' + cw.regions + ' منطقه</span>' : '') + '</label>';
 	}
 	var total = 0;
 	var crowdMap = {};
@@ -5587,7 +5524,7 @@ async function lmlLoadGhRepo() {
 			box.innerHTML = glob.map(repoRow).join('');
 			total += glob.length;
 		}
-		var ebox = $('lmlExtRepoList'), einfo = $('lmlExtSourceStatus'), einp = $('lmlExtSourceInput');
+		var ebox = $('tajExtRepoList'), einfo = $('tajExtSourceStatus'), einp = $('tajExtSourceInput');
 		if (ebox) {
 			if (!ext.length) {
 				if (einfo) einfo.textContent = (d && d.ext_set) ? 'منبع ذخیره شده ولی هنوز آی‌پی‌ای استخراج نشده (کش تا ۱۰ دقیقه).' : 'منبعی تنظیم نشده — لینک اشتراک هر سرویسی را ذخیره کنید تا آی‌پی‌هایش زنده به مخزن اضافه شود.';
@@ -5609,7 +5546,7 @@ async function lmlLoadGhRepo() {
 	}
 	var poolCount = 0;
 	try {
-		var pinfo = $('lmlPoolInfo'), pbox = $('lmlPoolList');
+		var pinfo = $('tajPoolInfo'), pbox = $('tajPoolList');
 		var pres = await api('/api/ip-pool');
 		var pd = await pres.json().catch(function () { return {}; });
 		var plist = (pd && Array.isArray(pd.ips)) ? pd.ips : [];
@@ -5621,18 +5558,18 @@ async function lmlLoadGhRepo() {
 			} else {
 				if (pinfo) pinfo.textContent = plist.length + ' آی‌پی تأییدشده با تست واقعی (پرچم = کشور ثبت‌شده):';
 				pbox.innerHTML = plist.map(function (it) {
-					return '<label style="display:flex;align-items:center;gap:8px;padding:3px 2px;cursor:pointer"><input type="checkbox" class="lml-pool-ip" value="' + attr(it.ip) + '"><span>' + (it.cc ? flagText(it.cc) + ' ' : '✅ ') + '</span><span class="mono" dir="ltr">' + esc(it.ip) + '</span></label>';
+					return '<label style="display:flex;align-items:center;gap:8px;padding:3px 2px;cursor:pointer"><input type="checkbox" class="taj-pool-ip" value="' + attr(it.ip) + '"><span>' + (it.cc ? flagText(it.cc) + ' ' : '✅ ') + '</span><span class="mono" dir="ltr">' + esc(it.ip) + '</span></label>';
 				}).join('');
 			}
 		}
 	} catch (e2) {
-		var pinfo2 = $('lmlPoolInfo');
+		var pinfo2 = $('tajPoolInfo');
 		if (pinfo2) pinfo2.textContent = 'استخر آی‌پی‌های تأییدشده در دسترس نیست.';
 	}
 	btn.disabled = !(total > 0 || poolCount > 0);
 }
-async function lmlSaveExtSource() {
-	var inp = $('lmlExtSourceInput'), st = $('lmlExtSourceStatus'), b = $('btnSaveExtSource');
+async function tajSaveExtSource() {
+	var inp = $('tajExtSourceInput'), st = $('tajExtSourceStatus'), b = $('btnSaveExtSource');
 	var v = ((inp && inp.value) || '').trim();
 	if (v && v.indexOf('http') !== 0) { toast('لینک باید با http یا https شروع شود.', 'err'); return; }
 	if (b) { b.disabled = true; b.textContent = 'در حال ذخیره...'; }
@@ -5642,7 +5579,7 @@ async function lmlSaveExtSource() {
 		var d = await res.json().catch(function () { return {}; });
 		if (d && d.success) {
 			toast(v ? ('✅ منبع زنده ذخیره شد — ' + (d.found || 0) + ' آی‌پی استخراج شد.') : '✅ منبع خارجی حذف شد.', 'ok');
-			await lmlLoadGhRepo();
+			await tajLoadGhRepo();
 		} else {
 			toast('❌ ' + ((d && d.error) || 'ذخیره منبع ناموفق بود'), 'err');
 			if (st) st.textContent = 'ذخیره ناموفق بود.';
@@ -5655,10 +5592,10 @@ async function lmlSaveExtSource() {
 		if (b2) { b2.disabled = false; b2.textContent = 'ذخیرهٔ منبع'; }
 	}
 }
-on($('btnSaveExtSource'), 'click', lmlSaveExtSource);
-window.lmlSaveExtSource = lmlSaveExtSource;
-function lmlAddGhRepoIps() {
-	var checked = $$('.lml-gh-ip').concat($$('.lml-pool-ip')).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+on($('btnSaveExtSource'), 'click', tajSaveExtSource);
+window.tajSaveExtSource = tajSaveExtSource;
+function tajAddGhRepoIps() {
+	var checked = $$('.taj-gh-ip').concat($$('.taj-pool-ip')).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
 	if (!checked.length) { toast('هیچ آی‌پی‌ای از مخزن انتخاب نشده است.', 'warn'); return; }
 	var NL = String.fromCharCode(10);
 	var cur = (($('fIps') && $('fIps').value) || '').split(NL).map(function (x) { return x.trim(); }).filter(function (x) { return x.length > 0; });
@@ -5667,12 +5604,12 @@ function lmlAddGhRepoIps() {
 	if ($('fIps')) $('fIps').value = cur.join(NL);
 	closeModal('modalIps');
 	openModal('modalUser');
-	if (added > 0) toast('✅ ' + added + ' آی‌پی از مخزن LML به فرم اضافه شد — کاربر را ذخیره کنید.', 'ok');
+	if (added > 0) toast('✅ ' + added + ' آی‌پی از مخزن TAJ به فرم اضافه شد — کاربر را ذخیره کنید.', 'ok');
 	else toast('این آی‌پی‌ها از قبل در فرم کاربر بودند.', 'ok');
 }
-on($('btnGhRepoAdd'), 'click', lmlAddGhRepoIps);
-window.lmlLoadGhRepo = lmlLoadGhRepo;
-window.lmlAddGhRepoIps = lmlAddGhRepoIps;
+on($('btnGhRepoAdd'), 'click', tajAddGhRepoIps);
+window.tajLoadGhRepo = tajLoadGhRepo;
+window.tajAddGhRepoIps = tajAddGhRepoIps;
 
 
 
@@ -6122,7 +6059,7 @@ async function createInstantTrial(btn) {
 		var res = await api('/api/trial', { method: 'POST' });
 		var d = await res.json().catch(function () { return {}; });
 		if (res.ok && d.success) {
-			try { if (typeof lmlCopy === 'function') lmlCopy(d.subUrl, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(d.subUrl).catch(function () { }); } catch (e) { }
+			try { if (typeof tajCopy === 'function') tajCopy(d.subUrl, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(d.subUrl).catch(function () { }); } catch (e) { }
 			toast('✅ اکانت ' + d.username + ' با موفقیت ایجاد و لینک کپی شد!', 'ok');
 			loadUsers();
 		} else toast((d && d.error) || 'خطا در ایجاد تست', 'err');
@@ -6134,10 +6071,10 @@ window.createTrialUser = createInstantTrial;
 
 function createWarpConfig() { toast('کانفیگ WARP از این نسخه حذف شده است.', 'info'); return;
 	var host = window.location.hostname;
-	var warpLink = 'vless://warp-core@engage.cloudflareclient.com:2408?encryption=none&security=none&type=ws&host=' + host + '&path=%2Fstream%2FLML_PANEL%2Fdefault#⚡%20LML%20❯%20[WARP-ON-WARP]';
+	var warpLink = 'vless://warp-core@engage.cloudflareclient.com:2408?encryption=none&security=none&type=ws&host=' + host + '&path=%2Fstream%2FTAJ_PANEL%2Fdefault#⚡%20TAJPANEL%20❯%20[WARP-ON-WARP]';
 	vset('warpConfig', warpLink);
 	renderQr('warpQr', warpLink, 180);
-	try { if (typeof lmlCopy === 'function') lmlCopy(warpLink, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(warpLink).catch(function () { }); } catch (e) { }
+	try { if (typeof tajCopy === 'function') tajCopy(warpLink, '', true); else if (navigator.clipboard) navigator.clipboard.writeText(warpLink).catch(function () { }); } catch (e) { }
 	openModal('modalWarp');
 	toast('🚀 کانفیگ اختصاصی WARP ایجاد و کپی شد!', 'ok');
 }
@@ -6340,23 +6277,29 @@ function emptyState(icon, title, desc) {
 		'<div class="sd" style="font-size:var(--fs-xs)">' + esc(desc) + '</div></div>';
 }
 function donut(segs, total) {
-	var size = 168, r = 66, sw = 22, c = 2 * Math.PI * r;
-	if (!total) return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '"><circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + r + '" fill="none" stroke="var(--surface-3)" stroke-width="' + sw + '"/></svg>';
-	var offset = 0;
-	var parts = segs.map(function (s) {
-		var frac = s.value / total;
-		var len = frac * c;
-		var el = '<circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + r + '" fill="none" stroke="' + s.color + '" stroke-width="' + sw +
-			'" stroke-dasharray="' + len + ' ' + (c - len) + '" stroke-dashoffset="' + (-offset) + '" transform="rotate(-90 ' + (size / 2) + ' ' + (size / 2) + ')" stroke-linecap="butt"/>';
-		offset += len;
-		return el;
-	}).join('');
-	return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" class="chart">' +
-		'<circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + r + '" fill="none" stroke="var(--surface-3)" stroke-width="' + sw + '"/>' +
-		parts +
-		'<text x="50%" y="48%" text-anchor="middle" fill="currentColor" style="font-size:26px;font-weight:800;font-family:var(--font-mono)" direction="ltr">' + total + '</text>' +
-		'<text x="50%" y="62%" text-anchor="middle" fill="var(--text-4)" style="font-size:10px">کاربر</text>' +
-		'</svg>';
+	/* TAJPANEL — ocean wave chart (replaces the old donut) */
+	var size = 340, h = 200, pad = 8;
+	var W = 100;
+	if (!segs || !segs.length || !total) {
+		return '<svg width="100%" height="' + h + '" viewBox="0 0 ' + W + ' ' + h + '" preserveAspectRatio="none" class="chart"><path d="M0 ' + (h / 2) + ' Q 25 ' + (h / 2 - 14) + ' 50 ' + (h / 2) + ' T 100 ' + (h / 2) + '" fill="none" stroke="var(--surface-3)" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>';
+	}
+	var colors = { active: 'var(--ok)', expired: 'var(--warn)', blocked: 'var(--err)' };
+	var keyMap = { '\u0641\u0639\u0627\u0644': 'active', '\u0645\u0646\u0642\u0636\u06cc': 'expired', '\u0645\u0633\u062f\u0648\u062f': 'blocked' };
+	var waves = [];
+	segs.forEach(function (s, idx) {
+		var frac = Math.max(0.04, s.value / total);
+		var amp = 10 + 26 * frac;
+		var base = h - 26 - idx * 30;
+		var col = colors[keyMap[s.label]] || s.color || 'var(--accent)';
+		var d = 'M0 ' + base;
+		for (var x = 0; x <= W; x += 5) {
+			var y = base - Math.sin((x / W) * Math.PI * 4 + idx * 1.7) * amp * Math.sin((x / W) * Math.PI);
+			d += ' L' + x + ' ' + y.toFixed(1);
+		}
+		d += ' L' + W + ' ' + h + ' L0 ' + h + ' Z';
+		waves.push('<path d="' + d + '" fill="' + col + '" fill-opacity="0.18" stroke="' + col + '" stroke-width="1.6" vector-effect="non-scaling-stroke"/>');
+	});
+	return '<svg width="100%" height="' + h + '" viewBox="0 0 ' + W + ' ' + h + '" preserveAspectRatio="none" class="chart">' + waves.join('') + '</svg>';
 }
 
 /* ============================================================
@@ -6611,7 +6554,7 @@ function downloadSmartBackup() {
 	toast('⏳ در حال آماده‌سازی فایل پشتیبان...', 'info');
 	var a = document.createElement('a');
 	a.href = '/api/backup-json';
-	a.download = 'lml-backup.json';
+	a.download = 'taj-backup.json';
 	a.click();
 }
 function downloadBackupFile() {
@@ -6623,7 +6566,7 @@ function exportUsersBackup() {
 	var blob = new Blob([data], { type: 'application/json;charset=utf-8' });
 	var a = document.createElement('a');
 	a.href = URL.createObjectURL(blob);
-	a.download = 'lml-users-' + new Date().toISOString().slice(0, 10) + '.json';
+	a.download = 'taj-users-' + new Date().toISOString().slice(0, 10) + '.json';
 	a.click();
 	toast('✅ فایل کاربران دانلود شد', 'ok');
 }
@@ -6796,7 +6739,7 @@ on($('btnDownloadBulk'), 'click', function () {
 	var blob = new Blob([$('bulkLinks').value], { type: 'text/plain;charset=utf-8' });
 	var a = document.createElement('a');
 	a.href = URL.createObjectURL(blob);
-	a.download = 'lml-bulk-users.txt';
+	a.download = 'taj-bulk-users.txt';
 	a.click();
 });
 window.toggleBulkModal = function (show) { if (show) openModal('modalBulk'); else closeModal('modalBulk'); };
@@ -7066,7 +7009,7 @@ $$('.acc-head').forEach(function (h) {
 function applyTheme(t) {
 	document.documentElement.setAttribute('data-theme', t);
 	document.documentElement.classList.toggle('dark', t !== 'light');
-	try { localStorage.setItem('lml-theme', t); } catch (e) { }
+	try { localStorage.setItem('taj-theme', t); } catch (e) { }
 	$('themeIcon').innerHTML = '<use href="#i-' + (t === 'light' ? 'sun' : 'moon') + '"/>';
 	var sel = $('setTheme');
 	if (sel) sel.value = t;
@@ -7077,7 +7020,7 @@ on($('btnTheme'), 'click', function () {
 function setSidebarMode(mode) {
 	closeSbFly();
 	document.documentElement.setAttribute('data-sidebar', mode);
-	try { localStorage.setItem('lml-sidebar', mode); } catch (e) { }
+	try { localStorage.setItem('taj-sidebar', mode); } catch (e) { }
 	var sel = $('setSidebar');
 	if (sel) sel.value = mode;
 }
@@ -7091,11 +7034,11 @@ on($('btnSidebar'), 'click', function () {
 	} else {
 		setSidebarMode('expanded');
 	}
-	try { localStorage.setItem('lml-sidebar-pref', cur === 'expanded' ? 'mini' : 'expanded'); } catch (e) {}
+	try { localStorage.setItem('taj-sidebar-pref', cur === 'expanded' ? 'mini' : 'expanded'); } catch (e) {}
 });
 function closeMobileSidebar() { document.body.classList.remove('sb-drawer');$('btnSidebar').setAttribute('aria-expanded','false'); }
 (function(){
- function viewport(){document.documentElement.style.setProperty('--lml-vh',Math.round(window.visualViewport?window.visualViewport.height:innerHeight)+'px');if(innerWidth>900)closeMobileSidebar();closeSbFly();}
+ function viewport(){document.documentElement.style.setProperty('--taj-vh',Math.round(window.visualViewport?window.visualViewport.height:innerHeight)+'px');if(innerWidth>900)closeMobileSidebar();closeSbFly();}
  viewport();window.addEventListener('resize',viewport);if(window.visualViewport)window.visualViewport.addEventListener('resize',viewport);
  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMobileSidebar();});
 })();
@@ -7112,7 +7055,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.taj-swatch'), function 
 });
 on($('setDensity'), 'change', function () {
 	document.documentElement.setAttribute('data-density', this.value);
-	try { localStorage.setItem('lml-density', this.value); } catch (e) { }
+	try { localStorage.setItem('taj-density', this.value); } catch (e) { }
 });
 on($('setSidebar'), 'change', function () { setSidebarMode(this.value); });
 on($('setGrayscale'), 'change', function () {
@@ -7226,7 +7169,7 @@ async function loadSettings() {
 		$('setProxySocks').value = d2.socks5 || '';
 	} catch (e) { }
 	$('setPanelUrl').value = window.location.origin;
-	$('setRefreshRate').value = (function () { try { return localStorage.getItem('lml_refresh_rate') || '60000'; } catch (e) { return '60000'; } })();
+	$('setRefreshRate').value = (function () { try { return localStorage.getItem('taj_refresh_rate') || '60000'; } catch (e) { return '60000'; } })();
 	$('setTheme').value = document.documentElement.getAttribute('data-theme') || 'dark';
 	$('setDensity').value = document.documentElement.getAttribute('data-density') || 'comfortable';
 	$('setSidebar').value = document.documentElement.getAttribute('data-sidebar') || 'expanded';
@@ -7259,7 +7202,7 @@ async function saveAllSettings() {
 		var res = await api('/api/settings/bulk', { body: { settings: payload } });
 		var d = await res.json().catch(function () { return {}; });
 		if (d && d.error) { toast('خطا: ' + d.error, 'err'); return; }
-		try { localStorage.setItem('lml_refresh_rate', $('setRefreshRate').value); } catch (e) { }
+		try { localStorage.setItem('taj_refresh_rate', $('setRefreshRate').value); } catch (e) { }
 		set('setLastSave', dateStr(Date.now()));
 		toast('✅ تنظیمات با موفقیت ذخیره شد', 'ok');
 		startRefreshInterval(parseInt($('setRefreshRate').value, 10));
@@ -7324,7 +7267,7 @@ window.checkAutoUpdateSetup = async function () {
    30. UPDATE / RESTART / SOURCE
    ============================================================ */
 var UPDATE_REPO = 'sasa200000/tajpanel';
-var UPDATE_FILES = ['worker.js', 'worker.js', 'index.js', 'main.js', 'src/worker.js', 'worker.js', 'worker.js.txt', 'worker', 'panel.js', 'LML.js', 'dist/worker.js', 'src/index.js'];
+var UPDATE_FILES = ['worker.js', 'worker.js', 'index.js', 'main.js', 'src/worker.js', 'worker.js', 'worker.js.txt', 'worker', 'panel.js', 'TAJ.js', 'dist/worker.js', 'src/index.js'];
 var UPDATE_BRANCHES = ['main', 'master', 'dev', 'v1', 'release'];
 var UPDATE_MIRRORS = ['https://raw.githubusercontent.com/', 'https://cdn.jsdelivr.net/gh/'];
 var UPDATE_TIMEOUT_MS = 8000;
@@ -7446,9 +7389,9 @@ window.fetchUpdateSource = fetchUpdateSource;
 /* ============================================================
    TAJ v1.0.4 — آپدیت خودکار از گیت‌هاب (با پرسش از مدیر)
    ============================================================ */
-var LML_UPDATE_PROMPT_AT = 0;
-var LML_UPDATE_PROMPT_VER = '';
-var LML_UPDATE_BUSY = false;
+var TAJ_UPDATE_PROMPT_AT = 0;
+var TAJ_UPDATE_PROMPT_VER = '';
+var TAJ_UPDATE_BUSY = false;
 
 async function checkForUpdates(isManual) {
 	try {
@@ -7475,9 +7418,9 @@ window.checkForUpdates = checkForUpdates;
 /* پرسش از مدیر: «می‌خوای اپدیت کنم؟» */
 async function promptUpdate(latest) {
 	var now = Date.now();
-	if (LML_UPDATE_PROMPT_VER === latest && (now - LML_UPDATE_PROMPT_AT) < 6 * 3600 * 1000) return false;
-	LML_UPDATE_PROMPT_AT = now;
-	LML_UPDATE_PROMPT_VER = latest;
+	if (TAJ_UPDATE_PROMPT_VER === latest && (now - TAJ_UPDATE_PROMPT_AT) < 6 * 3600 * 1000) return false;
+	TAJ_UPDATE_PROMPT_AT = now;
+	TAJ_UPDATE_PROMPT_VER = latest;
 	var ok = await confirmBox('نسخهٔ ' + latest + ' روی مخزن گیت‌هاب موجود است (نسخهٔ فعلی پنل: ' + CURRENT_VERSION + '). آپدیت انجام شود؟ (به نسخه بالاتر یا پایین‌تر)',
 		{ title: 'اپدیت خودکار از گیت‌هاب', okText: 'بله، اپدیت کن', cancelText: 'بعداً' });
 	if (!ok) return false;
@@ -7487,8 +7430,8 @@ window.promptUpdate = promptUpdate;
 
 /* اعمال واقعی آپدیت: سورس از گیت‌هاب گرفته و روی همین ورکر نوشته می‌شود */
 async function applyPanelUpdate(token) {
-	if (LML_UPDATE_BUSY) { toast('یک آپدیت در حال انجام است؛ چند لحظه صبر کنید.', 'warn'); return false; }
-	LML_UPDATE_BUSY = true;
+	if (TAJ_UPDATE_BUSY) { toast('یک آپدیت در حال انجام است؛ چند لحظه صبر کنید.', 'warn'); return false; }
+	TAJ_UPDATE_BUSY = true;
 	try {
 		closeModal('modalUpdate');
 		toast('در حال دریافت و اعمال آپدیت از گیت‌هاب... لطفاً چند ثانیه صبر کنید.', 'info', 12000);
@@ -7502,7 +7445,7 @@ async function applyPanelUpdate(token) {
 		if (res.ok && data.success) {
 			toast('✅ آپدیت با موفقیت اعمال شد. صفحه رفرش می‌شود...', 'ok', 9000);
 			setTimeout(function () {
-				try { sessionStorage.setItem('lml_last_update', Date.now()); } catch (e) { }
+				try { sessionStorage.setItem('taj_last_update', Date.now()); } catch (e) { }
 				window.location.reload();
 			}, 6000);
 			return true;
@@ -7513,7 +7456,7 @@ async function applyPanelUpdate(token) {
 		toast('❌ خطا در ارتباط با سرور: ' + e.message, 'err', 9000);
 		return false;
 	} finally {
-		LML_UPDATE_BUSY = false;
+		TAJ_UPDATE_BUSY = false;
 	}
 }
 window.applyPanelUpdate = applyPanelUpdate;
@@ -7521,7 +7464,7 @@ window.applyPanelUpdate = applyPanelUpdate;
 /* ============================================================
    TAJ IP-FREE — مرتب‌سازی آی‌پی‌ها: بدون بررسی رنج، بدون خطا
    ============================================================ */
-async function lmlFilterIpsNow() {
+async function tajFilterIpsNow() {
 	var st = $('sslTestStatus');
 	var raw = ($('fIps') && $('fIps').value) || '';
 	var ips = raw.replace(/[^0-9.]/g, ' ').split(' ').filter(function (x) {
@@ -7538,15 +7481,15 @@ async function lmlFilterIpsNow() {
 	}
 	toast('✅ ' + uniq.length + ' آی‌پی پذیرفته و مرتب شد.', 'ok');
 }
-window.lmlFilterIpsNow = lmlFilterIpsNow;
-on($('btnFilterIps'), 'click', function () { lmlFilterIpsNow(); });
+window.tajFilterIpsNow = tajFilterIpsNow;
+on($('btnFilterIps'), 'click', function () { tajFilterIpsNow(); });
 
 /* ============================================================
    تست آی‌پی تمیز — handshake واقعی TLS از ورکر (مثل رادار نوا)
    آی‌پی‌های مردود از فیلد حذف و در DB نشان‌گذاری می‌شوند تا
    خودکار از کانفیگ‌ها کنار بمانند ⇒ بدون خطای SSL/CCL
    ============================================================ */
-async function lmlTestIpsNow(isAuto) {
+async function tajTestIpsNow(isAuto) {
 	var st = $('sslTestStatus');
 	var raw = ($('fIps') && $('fIps').value) || '';
 	var ips = raw.replace(/[^0-9.]/g, ' ').split(' ').filter(function (x) {
@@ -7585,21 +7528,21 @@ async function lmlTestIpsNow(isAuto) {
 		if (btn2) { btn2.disabled = false; btn2.innerHTML = '<svg><use href="#i-activity"/></svg>تست آی‌پی تمیز'; }
 	}
 }
-on($('btnTestIps'), 'click', function () { lmlTestIpsNow(); });
-window.lmlTestIpsNow = lmlTestIpsNow;
+on($('btnTestIps'), 'click', function () { tajTestIpsNow(); });
+window.tajTestIpsNow = tajTestIpsNow;
 /* تست خودکار: وقتی آی‌پی وارد/ویرایش شد، بدون زدن دکمه تست می‌شود */
-var lmlAutoTestTimer = null;
-var lmlLastAutoTestedVal = null;
-function lmlScheduleIpAutoTest() {
-	if (lmlAutoTestTimer) clearTimeout(lmlAutoTestTimer);
-	lmlAutoTestTimer = setTimeout(function () {
+var tajAutoTestTimer = null;
+var tajLastAutoTestedVal = null;
+function tajScheduleIpAutoTest() {
+	if (tajAutoTestTimer) clearTimeout(tajAutoTestTimer);
+	tajAutoTestTimer = setTimeout(function () {
 		var v = (($('fIps') && $('fIps').value) || '').trim();
-		if (!v || v === lmlLastAutoTestedVal) return;
-		lmlLastAutoTestedVal = v;
-		lmlTestIpsNow(true);
+		if (!v || v === tajLastAutoTestedVal) return;
+		tajLastAutoTestedVal = v;
+		tajTestIpsNow(true);
 	}, 900);
 }
-if ($('fIps')) { on($('fIps'), 'blur', lmlScheduleIpAutoTest); on($('fIps'), 'change', lmlScheduleIpAutoTest); }/* Draws the outcome of an update check into every place it can be seen, so
+if ($('fIps')) { on($('fIps'), 'blur', tajScheduleIpAutoTest); on($('fIps'), 'change', tajScheduleIpAutoTest); }/* Draws the outcome of an update check into every place it can be seen, so
    the answer shows up wherever the button was pressed instead of only as a
    toast that disappears. */
 function renderUpdateState(info) {
@@ -7669,7 +7612,7 @@ async function handleCoreAction(actionType, token) {
 			if (isUpdate) {
 				toast('✅ آپدیت با موفقیت اعمال شد. صفحه در حال بارگذاری مجدد...', 'ok', 8000);
 				setTimeout(function () {
-					try { sessionStorage.setItem('lml_last_update', Date.now()); } catch (e) { }
+					try { sessionStorage.setItem('taj_last_update', Date.now()); } catch (e) { }
 					window.location.href = window.location.pathname + '?t=' + Date.now();
 				}, 10000);
 			} else {
@@ -7810,7 +7753,7 @@ on($('btnSupport'), 'click', function () {
 			'<p>آخرین اخبار، انتشار نسخه‌های جدید و اطلاعیه‌های TAJPANEL اول از همه اینجا منتشر می‌شود — عضو شوید تا جا نمانید.</p>' +
 			'<div style="display:grid;gap:8px;margin-top:14px">' +
 			'<button type="button" class="btn btn-block" id="socTg" style="justify-content:flex-start;background:#229ED9;color:#fff;border-color:#229ED9">' +
-			'<svg><use href="#i-telegram"/></svg>کانال تلگرام — t.me/LML_panel</button>' +
+			'<svg><use href="#i-telegram"/></svg>کانال تلگرام — t.me/TAJ_panel</button>' +
 			'<button type="button" class="btn btn-block" id="socGh" style="justify-content:flex-start">' +
 			'<svg><use href="#i-github"/></svg>گیت‌هاب پروژه — TAJPANEL</button>' +
 			'</div>' +
@@ -7820,8 +7763,8 @@ on($('btnSupport'), 'click', function () {
 		]
 	});
 	setTimeout(function () {
-		on($('socTg'), 'click', function () { window.open('https://t.me/LML_panel', '_blank'); });
-		on($('socGh'), 'click', function () { window.open('https://github.com/nukesamp-crypto/TAJPANEL', '_blank'); });
+		on($('socTg'), 'click', function () { window.open('https://t.me/TAJ_panel', '_blank'); });
+		on($('socGh'), 'click', function () { window.open('https://github.com/sasa200000/tajpanel', '_blank'); });
 	}, 60);
 });
 on($('btnNotifications'), 'click', function () {
@@ -7866,7 +7809,7 @@ function openOnlineCounterWarning() {
    ============================================================ */
 window.deferredPwaPrompt = null;
 window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.deferredPwaPrompt = e; });
-window.addEventListener('appinstalled', function () { window.deferredPwaPrompt = null; toast('✅ اپلیکیشن LML با موفقیت روی دستگاه شما نصب شد!', 'ok'); });
+window.addEventListener('appinstalled', function () { window.deferredPwaPrompt = null; toast('✅ اپلیکیشن TAJ با موفقیت روی دستگاه شما نصب شد!', 'ok'); });
 function isIosDevice() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
 function isPwaStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
 function triggerPwaInstall() {
@@ -7887,7 +7830,7 @@ function triggerPwaInstall() {
 	else if (/Firefox/.test(ua)) name = 'Firefox';
 	else if (/Safari/.test(ua)) name = 'Safari';
 	genericModal({
-		title: 'نصب اپلیکیشن LML',
+		title: 'نصب اپلیکیشن TAJ',
 		sub: 'دسترسی سریع‌تر از صفحه اصلی دستگاه',
 		icon: 'phone',
 		body: '<div style="line-height:1.9">' +
@@ -7920,7 +7863,7 @@ function startRefreshInterval(ms) {
 }
 window.startRefreshInterval = startRefreshInterval;
 function changeRefreshRate(ms) {
-	try { localStorage.setItem('lml_refresh_rate', String(ms)); } catch (e) { }
+	try { localStorage.setItem('taj_refresh_rate', String(ms)); } catch (e) { }
 	startRefreshInterval(ms);
 }
 window.changeRefreshRate = changeRefreshRate;
@@ -7996,7 +7939,7 @@ on($('setAutoScan'), 'change', function () { State.scanEnabled = this.checked; }
    ============================================================ */
 function initBetaNotice() {
 	var banner = $('betaBanner');
-	var key = 'lml_v1_seen_' + CURRENT_VERSION;
+	var key = 'taj_v1_seen_' + CURRENT_VERSION;
 	var seen = false;
 	try { seen = localStorage.getItem(key) === '1'; } catch (e) { }
 	if (banner) banner.style.display = seen ? 'none' : '';
@@ -8005,7 +7948,7 @@ function initBetaNotice() {
 		if (banner) banner.style.display = 'none';
 		try { localStorage.setItem(key, '1'); } catch (e) { }
 	});
-	if (!seen) setTimeout(function () { toast('✨ به نسخه ۱ پایدار LML خوش آمدید!', 'ok'); }, 1500);
+	if (!seen) setTimeout(function () { toast('✨ به نسخه ۱ پایدار TAJ خوش آمدید!', 'ok'); }, 1500);
 }
 window.initBetaNotice = initBetaNotice;
 
@@ -8178,7 +8121,7 @@ async function runQuickCreate() {
 		} catch (e) { }
 		var made = [];
 		for (var k = 0; k < count; k++) {
-			var name = 'lml_' + Math.random().toString(36).slice(2, 7) + (count > 1 ? ('_' + (k + 1)) : '');
+			var name = 'taj_' + Math.random().toString(36).slice(2, 7) + (count > 1 ? ('_' + (k + 1)) : '');
 			var res = await api('/api/users', {
 				method: 'POST',
 				body: {
@@ -8233,8 +8176,8 @@ async function initPanelApp() {
 	renderProxyFieldsUI();
 	startRefreshInterval((function () {
 		try {
-			var r = parseInt(localStorage.getItem('lml_refresh_rate'), 10);
-			if (!r || r < 60000) { r = 60000; try { localStorage.setItem('lml_refresh_rate', '60000'); } catch (e) { } }
+			var r = parseInt(localStorage.getItem('taj_refresh_rate'), 10);
+			if (!r || r < 60000) { r = 60000; try { localStorage.setItem('taj_refresh_rate', '60000'); } catch (e) { } }
 			var sel = $('setRefreshRate');
 			if (sel) sel.value = String(r);
 			return r;
@@ -8251,7 +8194,7 @@ async function initPanelApp() {
 	await loadTelegramSettings();
 	renderSystemViews();
 	initBetaNotice();
-	set('lmlVer', 'v' + CURRENT_VERSION);
+	set('tajVer', 'v' + CURRENT_VERSION);
 	/* pause live table refresh while the pointer is over the users view */
 	var uv = $('view-users');
 	if (uv) {
@@ -8332,10 +8275,14 @@ function tajDrawChart() {
 			var key = pair[0], col = pair[1];
 			ctx.strokeStyle = col; ctx.fillStyle = col;
 			ctx.beginPath();
-			for (var i2 = 0; i2 < n; i2++) {
-				var X = px(i2), Y = py(TAJ_LIVE_DATA[i2][key]);
-				if (i2 === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+			var pts = [];
+			for (var i2 = 0; i2 < n; i2++) pts.push([px(i2), py(TAJ_LIVE_DATA[i2][key])]);
+			ctx.moveTo(pts[0][0], pts[0][1]);
+			for (var i3 = 1; i3 < pts.length; i3++) {
+				var mx = (pts[i3 - 1][0] + pts[i3][0]) / 2, my = (pts[i3 - 1][1] + pts[i3][1]) / 2;
+				ctx.quadraticCurveTo(pts[i3 - 1][0], pts[i3 - 1][1], mx, my);
 			}
+			ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
 			ctx.stroke();
 			ctx.globalAlpha = 0.12; ctx.lineTo(px(n - 1), pad.t + ih); ctx.lineTo(px(0), pad.t + ih); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
 		});
@@ -8370,7 +8317,7 @@ window.initPanelApp = initPanelApp;
 (function () {
 	function showOnboarding() {
 		if (!$('modalOnboarding') || !$('onboardNext')) return; /* onboarding markup not present */
-		var key = 'lml_onboarded_v' + CURRENT_VERSION;
+		var key = 'taj_onboarded_v' + CURRENT_VERSION;
 		try { if (localStorage.getItem(key) === '1') return; } catch (e) {}
 		setTimeout(function () {
 			openModal('modalOnboarding');
@@ -8451,13 +8398,13 @@ window.alert = window.alert;
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(id){document.getElementById(id).classList.remove('open');if(!document.querySelector('.modal.open'))document.body.style.overflow='';}
 var release=null;
-var button=document.createElement('button');button.id='lmlReleaseBadge';button.className='btn btn-primary';button.style.cssText='position:fixed;bottom:22px;left:22px;z-index:1100;box-shadow:0 8px 30px #0008';button.textContent='تازه‌های نسخه 1.0.0';document.body.appendChild(button);
-function show(){if(!release)return;document.getElementById('lmlReleaseVersion').textContent='نسخه '+release.version;var list=document.getElementById('lmlReleaseNotes');list.replaceChildren();release.notes.forEach(function(n){var li=document.createElement('li');li.textContent=n;list.appendChild(li);});openModal('lmlReleaseModal');}
+var button=document.createElement('button');button.id='tajReleaseBadge';button.className='btn btn-primary';button.style.cssText='position:fixed;bottom:22px;left:22px;z-index:1100;box-shadow:0 8px 30px #0008';button.textContent='تازه‌های نسخه 1.0.0';document.body.appendChild(button);
+function show(){if(!release)return;document.getElementById('tajReleaseVersion').textContent='نسخه '+release.version;var list=document.getElementById('tajReleaseNotes');list.replaceChildren();release.notes.forEach(function(n){var li=document.createElement('li');li.textContent=n;list.appendChild(li);});openModal('tajReleaseModal');}
 button.onclick=show;
-document.getElementById('lmlReleaseSeen').onclick=function(){try{localStorage.setItem('lml.release.seen',release.build||release.version);}catch(e){}button.style.display='none';closeModal('lmlReleaseModal');};
-document.getElementById('lmlReleaseRefresh').onclick=function(){location.reload();};
-async function check(){try{var r=await fetch('/lml-scanner/release',{cache:'no-store'});if(!r.ok)return;var j=await r.json();if(typeof j.version!=='string'||!Array.isArray(j.notes))return;release=j;var seen='';try{seen=localStorage.getItem('lml.release.seen')||'';}catch(e){}button.textContent='تازه‌های نسخه '+j.version;button.style.display=seen===(j.build||j.version)?'none':'';}catch(e){button.style.display='none';}}
-window.lmlShowRelease=async function(){await check();show();};
+document.getElementById('tajReleaseSeen').onclick=function(){try{localStorage.setItem('taj.release.seen',release.build||release.version);}catch(e){}button.style.display='none';closeModal('tajReleaseModal');};
+document.getElementById('tajReleaseRefresh').onclick=function(){location.reload();};
+async function check(){try{var r=await fetch('/taj-scanner/release',{cache:'no-store'});if(!r.ok)return;var j=await r.json();if(typeof j.version!=='string'||!Array.isArray(j.notes))return;release=j;var seen='';try{seen=localStorage.getItem('taj.release.seen')||'';}catch(e){}button.textContent='تازه‌های نسخه '+j.version;button.style.display=seen===(j.build||j.version)?'none':'';}catch(e){button.style.display='none';}}
+window.tajShowRelease=async function(){await check();show();};
 button.style.display='none';check();setInterval(check,300000);document.addEventListener('visibilitychange',function(){if(!document.hidden)check();});
 })();
 </script>
