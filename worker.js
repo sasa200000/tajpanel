@@ -2110,7 +2110,30 @@ const Router = {
 			}
 		}
 
-		if (url.pathname === "/api/telegram-webhook" && request.method === "POST") {
+		if (url.pathname === "/api/bot-discount" && request.method === "POST") {
+			try {
+				const sc = request.headers.get("Cookie") || "";
+				const sv = (sc.match(/panel_session=([0-9a-f]+)/) || [])[1];
+				const pwRow = await env.DB.prepare("SELECT value FROM settings WHERE key = 'panel_password'").first();
+				if (!sv || !pwRow || sv !== pwRow.value) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+				const body = await readJsonBody(request);
+				const tokenRow = await env.DB.prepare("SELECT value FROM settings WHERE key = 'bot_api_token'").first();
+				const urlRow = await env.DB.prepare("SELECT value FROM settings WHERE key = 'bot_worker_url'").first();
+				const secret = tokenRow ? tokenRow.value : "";
+				const botUrl = (urlRow ? urlRow.value : "") || "https://tajbot.gijiva5300.workers.dev";
+				if (!secret) return new Response(JSON.stringify({ error: "ابتدا توکن اتصال ربات را در تنظیمات ذخیره کنید" }), { status: 400 });
+				const pct = Math.min(50, Math.max(1, parseInt(body.pct || 5, 10)));
+				const rnd = Math.random().toString(36).substring(2, 6).toUpperCase() + Math.random().toString(36).substring(2, 10).toUpperCase();
+				const code = "OFF" + pct + "-" + rnd;
+				await env.DB.prepare("INSERT OR IGNORE INTO discounts (code,pct,used,user_id,created) VALUES (?,?,?,?,?)")
+					.bind(code, pct, 0, body.user_id || 0, Date.now()).run();
+				return new Response(JSON.stringify({ ok: true, code, pct }), { headers: { "Content-Type": "application/json; charset=utf-8" } });
+			} catch(e) {
+				return new Response(JSON.stringify({ error: e.message }), { status: 500 });
+			}
+		}
+
+if (url.pathname === "/api/telegram-webhook" && request.method === "POST") {
 			try {
 				const update = await readJsonBody(request);
 				const msg = update.message || update.edited_message;
@@ -9790,7 +9813,39 @@ const HTML_TEMPLATES = {
 					</div>
 				</div>
 
-				<div class="grid g-main">
+							<div class="card" style="margin-bottom:12px">
+				<div class="card-head">
+					<div>
+						<h2 class="card-title">🤖 اتصال ربات فروش TAJPANEL</h2>
+						<p class="card-desc">کدهای تخفیف از این پنل تولید و به گردونه ربات وصل می‌شوند</p>
+					</div>
+					<div class="page-actions">
+						<button type="button" class="btn btn-primary" id="btnBotSave"><svg><use href="#i-check"/></svg>ذخیره اتصال</button>
+					</div>
+				</div>
+				<div class="grid g-2">
+					<div class="field">
+						<label for="botWorkerUrl">آدرس ورکر ربات</label>
+						<input type="text" class="input input-mono" id="botWorkerUrl" placeholder="https://tajbot.gijiva5300.workers.dev" autocomplete="off" spellcheck="false">
+					</div>
+					<div class="field">
+						<label for="botApiToken">توکن اتصال ربات</label>
+						<input type="text" class="input input-mono" id="botApiToken" placeholder="tajbot-secret-..." autocomplete="off" spellcheck="false">
+					</div>
+				</div>
+				<div class="grid g-2" style="margin-top:12px">
+					<div class="field">
+						<label for="botDiscPct">درصد تخفیف (۱ تا ۵۰)</label>
+						<input type="number" class="input" id="botDiscPct" min="1" max="50" placeholder="7" value="7">
+					</div>
+					<div class="field" style="display:flex;align-items:flex-end">
+						<button type="button" class="btn" id="btnBotDisc"><svg><use href="#i-ticket"/></svg>تولید کد تخفیف</button>
+					</div>
+				</div>
+				<div id="botDiscResult" style="margin-top:10px"></div>
+			</div>
+
+<div class="grid g-main">
 					<div class="card">
 						<div class="card-head">
 							<div>
@@ -13949,6 +14004,16 @@ async function loadTelegramSettings() {
 		$('tgStatusIcon').style.color = connected ? 'var(--ok)' : 'var(--text-3)';
 		$('tgWebhookState').textContent = connected ? 'تنظیم‌شده' : '—';
 		$('tgWebhookState').style.color = connected ? 'var(--ok)' : 'var(--text-3)';
+		// اتصال ربات فروش
+		try {
+			var sres = await api('/api/settings/bulk');
+			if (sres.ok) {
+				var s = await sres.json();
+				if ($('botWorkerUrl')) $('botWorkerUrl').value = s.bot_worker_url || '';
+				if ($('botApiToken')) $('botApiToken').value = s.bot_api_token || '';
+				if ($('botDiscPct')) $('botDiscPct').value = s.bot_disc_pct || '7';
+			}
+		} catch (e) { }
 	} catch (e) { }
 }
 async function saveTelegramSettings(token, adminId) {
@@ -13981,6 +14046,30 @@ on($('btnTgBackup'), 'click', function () {
 		.then(function (res) { return res.json(); })
 		.then(function (d) { toast((d && d.success) ? ('✅ ' + d.message) : ('خطا: ' + ((d && d.error) || 'ارسال ناموفق بود')), (d && d.success) ? 'ok' : 'err'); })
 		.catch(function () { toast('خطا در ارتباط با سرور', 'err'); });
+});
+on($('btnBotSave'), 'click', async function () {
+	try {
+		var res = await api('/api/settings/bulk', { method: 'POST', body: { settings: {
+			bot_worker_url: $('botWorkerUrl').value.trim(),
+			bot_api_token: $('botApiToken').value.trim(),
+			bot_disc_pct: String($('botDiscPct').value || '7')
+		} } });
+		var d = await res.json().catch(function () { return {}; });
+		toast((res.ok && d.success) ? '✅ تنظیمات اتصال ربات ذخیره شد' : 'خطا در ذخیره', (res.ok && d.success) ? 'ok' : 'err');
+	} catch (e) { toast('خطا در ارتباط', 'err'); }
+});
+on($('btnBotDisc'), 'click', async function () {
+	try {
+		toast('⏳ در حال ساخت کد تخفیف...', 'info');
+		var res = await api('/api/bot-discount', { method: 'POST', body: { pct: parseInt($('botDiscPct').value || '7', 10) } });
+		var d = await res.json().catch(function () { return {}; });
+		if (res.ok && d.ok && d.code) {
+			$('botDiscResult').innerHTML = '<div class="note ok" style="margin-top:8px"><svg><use href="#i-check"/></svg><div>کد تخفیف ساخته شد: <b style="font-family:monospace">' + d.code + '</b> (' + d.pct + '٪) — داخل ربات بفرستید تا فعال بشه</div></div>';
+			toast('✅ کد تخفیف ساخته شد', 'ok');
+		} else {
+			toast('خطا: ' + ((d && d.error) || 'ساخت ناموفق بود'), 'err');
+		}
+	} catch (e) { toast('خطا در ارتباط با ربات', 'err'); }
 });
 on($('btnTgOpenBot'), 'click', function () {
 	var token = $('tgToken').value.trim();
